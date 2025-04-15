@@ -1,4 +1,4 @@
-import express, { Response, NextFunction } from 'express';
+import express, { Response, NextFunction, RequestHandler } from 'express';
 import { PrismaClient } from '@prisma/client';
 import fileUpload, { UploadedFile } from 'express-fileupload';
 import path from 'path';
@@ -7,7 +7,6 @@ import { AuthRequest, authenticateToken, isHost } from '../middlewares/auth';
 const router = express.Router();
 const db = new PrismaClient();
 
-// Interfaces para tipado
 interface CarRequestBody {
   location: string;
   brand: string;
@@ -24,15 +23,172 @@ interface CarRequestBody {
   description?: string;
 }
 
-// Use UploadedFile from express-fileupload
 interface UploadedPhoto extends UploadedFile {
   mv(path: string): Promise<void>;
 }
 
-// Middleware para manejar archivos
 router.use(fileUpload());
 
-// Ruta para agregar un nuevo auto
+router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const totalCars = await db.car.count({ where: { userId } });
+    const cars = await db.car.findMany({
+      where: { userId },
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        brand: true,
+        model: true,
+        year: true,
+        carType: true,
+        color: true,
+        pricePerDay: true,
+        seats: true,
+        transmission: true,
+        photos: true,
+        createdAt: true,
+      },
+    });
+
+    const totalPages = Math.ceil(totalCars / limit);
+
+    res.status(200).json({
+      cars: cars.map(car => ({
+        ...car,
+        category: car.carType,
+        imageUrl: car.photos[0] || '/placeholder-car.jpg',
+        isAvailable: true,
+      })),
+      totalCars,
+      currentPage: page,
+      totalPages,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const carId = parseInt(req.params.id);
+    const car = await db.car.findUnique({
+      where: { id: carId },
+      select: {
+        id: true,
+        brand: true,
+        model: true,
+        year: true,
+        carType: true,
+        color: true,
+        pricePerDay: true,
+        seats: true,
+        transmission: true,
+        photos: true,
+        createdAt: true,
+      },
+    });
+
+    if (!car) {
+      res.status(404).json({ error: 'Auto no encontrado' });
+      return;
+    }
+
+    res.status(200).json({
+      ...car,
+      category: car.carType,
+      imageUrl: car.photos[0] || '/placeholder-car.jpg',
+      isAvailable: true,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const carId = parseInt(req.params.id);
+    const car = await db.car.findUnique({ where: { id: carId } });
+
+    if (!car) {
+      res.status(404).json({ error: 'Auto no encontrado' });
+      return;
+    }
+
+    if (car.userId !== req.user!.id) {
+      res.status(403).json({ error: 'No autorizado para eliminar este auto' });
+      return;
+    }
+
+    await db.car.delete({ where: { id: carId } });
+    res.status(200).json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const carId = parseInt(req.params.id);
+    const car = await db.car.findUnique({ where: { id: carId } });
+
+    if (!car) {
+      res.status(404).json({ error: 'Auto no encontrado' });
+      return;
+    }
+
+    if (car.userId !== req.user!.id) {
+      res.status(403).json({ error: 'No autorizado para actualizar este auto' });
+      return;
+    }
+
+    const {
+      brand,
+      model,
+      year,
+      carType,
+      color,
+      pricePerDay,
+      seats,
+      transmission,
+      imageUrl,
+      isAvailable,
+    } = req.body;
+
+    const updatedCar = await db.car.update({
+      where: { id: carId },
+      data: {
+        brand: brand || car.brand,
+        model: model || car.model,
+        year: year ? parseInt(year) : car.year,
+        carType: carType || car.carType,
+        color: color || car.color,
+        pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
+        seats: seats ? parseInt(seats) : car.seats,
+        transmission: transmission || car.transmission,
+        photos: imageUrl ? [imageUrl] : car.photos,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      car: {
+        ...updatedCar,
+        category: updatedCar.carType,
+        imageUrl: updatedCar.photos[0] || '/placeholder-car.jpg',
+        isAvailable: isAvailable !== undefined ? isAvailable : true,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -51,19 +207,16 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Respon
       description,
     } = req.body as CarRequestBody;
 
-    // Validar campos obligatorios
     if (!location || !brand || !year || !pricePerDay || !kilometers || !licensePlate || !transmission || !fuelType || !seats) {
       res.status(400).json({ error: 'Faltan campos obligatorios' });
       return;
     }
 
-    // Manejar las fotos
     if (!req.files || !req.files.photos) {
       res.status(400).json({ error: 'Debes subir al menos 3 fotos' });
       return;
     }
 
-    // Asegurar que photos sea un array
     const photoFiles = req.files.photos;
     const photos: UploadedPhoto[] = Array.isArray(photoFiles) ? photoFiles : [photoFiles as UploadedPhoto];
 
@@ -72,19 +225,17 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Respon
       return;
     }
 
-    // Guardar las fotos en el servidor
     const photoPaths: string[] = [];
     for (const photo of photos) {
       const fileName = `${Date.now()}-${photo.name}`;
       const filePath = path.join(__dirname, '../../Uploads', fileName);
       await photo.mv(filePath);
-      photoPaths.push(`/uploads/${fileName}`);
+      photoPaths.push(`/Uploads/${fileName}`);
     }
 
-    // Guardar el auto en la base de datos
     const newCar = await db.car.create({
       data: {
-        userId: req.user!.id, // Obtenido del token a través de req.user.id
+        userId: req.user!.id,
         location,
         brand,
         model: model || undefined,
@@ -104,7 +255,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Respon
 
     res.status(201).json({ success: true, car: newCar });
   } catch (err) {
-    next(err); // Pass errors to Express error middleware
+    next(err);
   }
 });
 

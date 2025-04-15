@@ -7,7 +7,7 @@
     /* Modules */
     "module": "commonjs", /* CommonJS para Node.js */
     "moduleResolution": "node", /* Asegurar resolución de módulos estilo Node.js */
-    "rootDir": "./src", /* Carpeta fuente */
+    "rootDir": ".", /* Carpeta fuente */
     "outDir": "./dist", /* Carpeta de salida */
     "baseUrl": ".", /* Base para resolución de módulos */
     "paths": {
