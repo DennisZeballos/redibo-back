@@ -1,16 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { FileArray } from 'express-fileupload'; // Import FileArray
 
-interface AuthRequest extends Request {
+// Definimos una interfaz común para el objeto req con user y files
+export interface AuthRequest extends Request {
   user?: { id: number; role: string };
+  files?: FileArray | null; // Use FileArray from express-fileupload
 }
 
-export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
   if (!token) {
-    return res.status(401).json({ error: 'Token no proporcionado' });
+    res.status(401).json({ error: 'Token no proporcionado' });
+    return;
   }
 
   try {
@@ -18,13 +22,15 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ error: 'Token inválido' });
+    res.status(403).json({ error: 'Token inválido' });
+    return;
   }
 };
 
-export const isHost = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user?.role !== 'host') {
-    return res.status(403).json({ error: 'Acceso denegado: se requiere rol de host' });
+export const isHost = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (!req.user || req.user.role !== 'host') {
+    res.status(403).json({ error: 'Acceso denegado: se requiere rol de host' });
+    return;
   }
   next();
 };

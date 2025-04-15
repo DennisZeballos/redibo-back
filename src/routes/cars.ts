@@ -1,80 +1,110 @@
-import { Router } from 'express';
+import express, { Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken, isHost } from '../middlewares/auth';
+import fileUpload, { UploadedFile } from 'express-fileupload';
+import path from 'path';
+import { AuthRequest, authenticateToken, isHost } from '../middlewares/auth';
 
-const router = Router();
-const prisma = new PrismaClient();
+const router = express.Router();
+const db = new PrismaClient();
 
-// Ruta para obtener los autos del host autenticado (con paginación)
-router.get('/my-cars', authenticateToken, isHost, async (req, res) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const pageSize = 4; // Máximo 4 autos por página, según los criterios
-  const skip = (page - 1) * pageSize;
+// Interfaces para tipado
+interface CarRequestBody {
+  location: string;
+  brand: string;
+  model?: string;
+  year: string;
+  carType?: string;
+  color?: string;
+  pricePerDay: string;
+  kilometers: string;
+  licensePlate: string;
+  transmission: string;
+  fuelType: string;
+  seats: string;
+  description?: string;
+}
 
+// Use UploadedFile from express-fileupload
+interface UploadedPhoto extends UploadedFile {
+  mv(path: string): Promise<void>;
+}
+
+// Middleware para manejar archivos
+router.use(fileUpload());
+
+// Ruta para agregar un nuevo auto
+router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const hostId = req.user!.id;
+    const {
+      location,
+      brand,
+      model,
+      year,
+      carType,
+      color,
+      pricePerDay,
+      kilometers,
+      licensePlate,
+      transmission,
+      fuelType,
+      seats,
+      description,
+    } = req.body as CarRequestBody;
 
-    // Obtener el total de autos del host
-    const totalCars = await prisma.car.count({
-      where: { hostId },
-    });
+    // Validar campos obligatorios
+    if (!location || !brand || !year || !pricePerDay || !kilometers || !licensePlate || !transmission || !fuelType || !seats) {
+      res.status(400).json({ error: 'Faltan campos obligatorios' });
+      return;
+    }
 
-    // Obtener los autos de la página actual
-    const cars = await prisma.car.findMany({
-      where: { hostId },
-      skip,
-      take: pageSize,
-      select: {
-        id: true,
-        brand: true,
-        model: true,
-        year: true,
-        seats: true,
-        transmission: true,
-        category: true,
-        color: true,
-        pricePerDay: true,
-        imageUrl: true,
-        isAvailable: true,
-        createdAt: true,
+    // Manejar las fotos
+    if (!req.files || !req.files.photos) {
+      res.status(400).json({ error: 'Debes subir al menos 3 fotos' });
+      return;
+    }
+
+    // Asegurar que photos sea un array
+    const photoFiles = req.files.photos;
+    const photos: UploadedPhoto[] = Array.isArray(photoFiles) ? photoFiles : [photoFiles as UploadedPhoto];
+
+    if (photos.length < 3 || photos.length > 5) {
+      res.status(400).json({ error: 'Debes subir entre 3 y 5 fotos' });
+      return;
+    }
+
+    // Guardar las fotos en el servidor
+    const photoPaths: string[] = [];
+    for (const photo of photos) {
+      const fileName = `${Date.now()}-${photo.name}`;
+      const filePath = path.join(__dirname, '../../Uploads', fileName);
+      await photo.mv(filePath);
+      photoPaths.push(`/uploads/${fileName}`);
+    }
+
+    // Guardar el auto en la base de datos
+    const newCar = await db.car.create({
+      data: {
+        userId: req.user!.id, // Obtenido del token a través de req.user.id
+        location,
+        brand,
+        model: model || undefined,
+        year: parseInt(year),
+        carType: carType || null,
+        color: color || undefined,
+        pricePerDay: parseFloat(pricePerDay),
+        kilometers,
+        licensePlate,
+        transmission,
+        fuelType,
+        seats: parseInt(seats),
+        description: description || null,
+        photos: photoPaths,
       },
     });
 
-    res.status(200).json({
-      cars,
-      totalCars,
-      currentPage: page,
-      totalPages: Math.ceil(totalCars / pageSize),
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los autos' });
-  }
-});
-
-// Ruta para eliminar un auto
-router.delete('/:id', authenticateToken, isHost, async (req, res) => {
-  const carId = parseInt(req.params.id);
-
-  try {
-    const hostId = req.user!.id;
-
-    const car = await prisma.car.findUnique({
-      where: { id: carId },
-    });
-
-    if (!car || car.hostId !== hostId) {
-      return res.status(404).json({ error: 'Auto no encontrado o no autorizado' });
-    }
-
-    await prisma.car.delete({
-      where: { id: carId },
-    });
-
-    res.status(200).json({ message: 'Auto eliminado correctamente' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al eliminar el auto' });
+    res.status(201).json({ success: true, car: newCar });
+  } catch (err) {
+    next(err); // Pass errors to Express error middleware
   }
 });
 
