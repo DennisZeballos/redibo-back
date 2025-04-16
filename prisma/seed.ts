@@ -1,4 +1,4 @@
-import { PrismaClient } from '../src/generated/client'; // Actualiza la importación
+import { PrismaClient } from '../src/generated/client';
 import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -73,6 +73,9 @@ async function main() {
         rentalCount: 10,
         rating: 4.9,
         discount: 10,
+        isAvailable: true, // Nuevo campo
+        unavailableDates: [], // Asegurarse de que sea un arreglo
+        extraEquipment: ['GPS', 'Asiento para niños'], // Ejemplo de equipamiento extra
       },
       {
         userId: host1.id,
@@ -97,6 +100,9 @@ async function main() {
         rentalCount: 6,
         rating: 4.7,
         discount: 8,
+        isAvailable: true, // Nuevo campo
+        unavailableDates: [], // Asegurarse de que sea un arreglo
+        extraEquipment: ['Techo solar'], // Ejemplo de equipamiento extra
       },
       {
         userId: host1.id,
@@ -121,6 +127,9 @@ async function main() {
         rentalCount: 4,
         rating: 4.6,
         discount: 6,
+        isAvailable: true, // Nuevo campo
+        unavailableDates: [], // Asegurarse de que sea un arreglo
+        extraEquipment: [], // Ejemplo de equipamiento extra
       },
       {
         userId: host1.id,
@@ -145,6 +154,9 @@ async function main() {
         rentalCount: 7,
         rating: 4.5,
         discount: 5,
+        isAvailable: true, // Nuevo campo
+        unavailableDates: [], // Asegurarse de que sea un arreglo
+        extraEquipment: ['Cámara de retroceso'], // Ejemplo de equipamiento extra
       },
       {
         userId: host2.id,
@@ -169,6 +181,9 @@ async function main() {
         rentalCount: 5,
         rating: 4.8,
         discount: 7,
+        isAvailable: true, // Nuevo campo
+        unavailableDates: [], // Asegurarse de que sea un arreglo
+        extraEquipment: [], // Ejemplo de equipamiento extra
       },
       {
         userId: host2.id,
@@ -193,6 +208,9 @@ async function main() {
         rentalCount: 3,
         rating: 4.1,
         discount: 9,
+        isAvailable: true, // Nuevo campo
+        unavailableDates: [], // Asegurarse de que sea un arreglo
+        extraEquipment: ['Barras de techo'], // Ejemplo de equipamiento extra
       },
     ],
   });

@@ -1,7 +1,5 @@
 import * as express from 'express';
-/*import { PrismaClient, Prisma } from '@prisma/client';*/
 import { PrismaClient, Prisma } from '../generated/client';
-/*import * as fileUpload from 'express-fileupload';*/
 import fileUpload from 'express-fileupload';
 import { UploadedFile } from 'express-fileupload';
 import * as path from 'path';
@@ -32,14 +30,16 @@ interface UploadedPhoto extends UploadedFile {
   mv(path: string): Promise<void>;
 }
 
-router.use(fileUpload({
-  limits: { fileSize: 5 * 1024 * 1024 },
-  abortOnLimit: true,
-  createParentPath: true,
-  safeFileNames: true,
-  useTempFiles: true,
-  tempFileDir: './tmp',
-}));
+router.use(
+  fileUpload({
+    limits: { fileSize: 5 * 1024 * 1024 },
+    abortOnLimit: true,
+    createParentPath: true,
+    safeFileNames: true,
+    useTempFiles: true,
+    tempFileDir: './tmp',
+  })
+);
 
 // GET /api/cars - Listar autos con filtros, búsqueda y ordenamiento
 router.get('/', async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
@@ -133,7 +133,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         break;
       case 'relevance':
       default:
-        orderBy = { createdAt: 'desc' }; // Simplificamos el ordenamiento por ahora
+        orderBy = { createdAt: 'desc' };
         break;
     }
 
@@ -159,13 +159,19 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
             email: true,
           },
         },
+        unavailableDates: true,
+        extraEquipment: true,
+        seats: true,
+        transmission: true,
+        color: true,
+        isAvailable: true, // Nuevo campo
       },
     });
 
     const totalPages = Math.ceil(totalCars / limit);
 
     res.status(200).json({
-      cars: cars.map(car => ({
+      cars: cars.map((car) => ({
         id: car.id,
         brand: car.brand,
         model: car.model,
@@ -174,11 +180,17 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         pricePerDay: car.pricePerDay,
         rentalCount: car.rentalCount,
         location: car.location,
-        imageUrl: (car.photos as string[])[0] || '/placeholder-car.jpg',
+        imageUrl: car.photos[0] || '/placeholder-car.jpg',
         host: {
           id: car.user.id,
           email: car.user.email,
         },
+        unavailableDates: car.unavailableDates,
+        extraEquipment: car.extraEquipment,
+        seats: car.seats,
+        transmission: car.transmission,
+        color: car.color,
+        isAvailable: car.isAvailable, // Usar el valor real de la base de datos
       })),
       totalCars,
       currentPage: pageNumber,
@@ -256,19 +268,28 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
         unavailableDates: true,
         extraEquipment: true,
         rentalCount: true,
+        isAvailable: true, // Nuevo campo
       },
     });
 
     const totalPages = Math.ceil(totalCars / limit);
 
     res.status(200).json({
-      cars: cars.map(car => ({
-        ...car,
+      cars: cars.map((car) => ({
+        id: car.id,
+        brand: car.brand,
+        model: car.model,
+        year: car.year,
         category: car.carType,
-        imageUrl: (car.photos as string[])[0] || '/placeholder-car.jpg',
-        isAvailable: true,
-        unavailableDates: car.unavailableDates || [],
-        extraEquipment: car.extraEquipment || [],
+        pricePerDay: car.pricePerDay,
+        seats: car.seats,
+        transmission: car.transmission,
+        color: car.color,
+        imageUrl: car.photos[0] || '/placeholder-car.jpg',
+        isAvailable: car.isAvailable, // Usar el valor real de la base de datos
+        unavailableDates: car.unavailableDates,
+        extraEquipment: car.extraEquipment,
+        rentalCount: car.rentalCount,
       })),
       totalCars,
       currentPage: page,
@@ -299,6 +320,13 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
         createdAt: true,
         unavailableDates: true,
         extraEquipment: true,
+        rentalCount: true,
+        location: true,
+        kilometers: true,
+        licensePlate: true,
+        fuelType: true,
+        description: true,
+        isAvailable: true, // Nuevo campo
       },
     });
 
@@ -308,12 +336,25 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
     }
 
     res.status(200).json({
-      ...car,
+      id: car.id,
+      brand: car.brand,
+      model: car.model,
+      year: car.year,
       category: car.carType,
-      imageUrl: (car.photos as string[])[0] || '/placeholder-car.jpg',
-      isAvailable: true,
-      unavailableDates: car.unavailableDates || [],
-      extraEquipment: car.extraEquipment || [],
+      pricePerDay: car.pricePerDay,
+      seats: car.seats,
+      transmission: car.transmission,
+      color: car.color,
+      imageUrl: car.photos[0] || '/placeholder-car.jpg',
+      isAvailable: car.isAvailable, // Usar el valor real de la base de datos
+      unavailableDates: car.unavailableDates,
+      extraEquipment: car.extraEquipment,
+      rentalCount: car.rentalCount,
+      location: car.location,
+      kilometers: car.kilometers,
+      licensePlate: car.licensePlate,
+      fuelType: car.fuelType,
+      description: car.description || '',
     });
   } catch (err) {
     next(err);
@@ -363,7 +404,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       brand,
       model,
       year,
-      carType,
+      category,
       color,
       pricePerDay,
       seats,
@@ -379,24 +420,33 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         brand: brand || car.brand,
         model: model || car.model,
         year: year ? parseInt(year) : car.year,
-        carType: carType || car.carType,
+        carType: category || car.carType,
         color: color || car.color,
         pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
         seats: seats ? parseInt(seats) : car.seats,
         transmission: transmission || car.transmission,
-        photos: imageUrl ? [imageUrl] : (car.photos || []), // Si car.photos es null, usa un array vacío
+        photos: imageUrl ? [imageUrl] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
+        isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable, // Nuevo campo
       },
     });
 
     res.status(200).json({
       success: true,
       car: {
-        ...updatedCar,
+        id: updatedCar.id,
+        brand: updatedCar.brand,
+        model: updatedCar.model,
+        year: updatedCar.year,
         category: updatedCar.carType,
-        imageUrl: (updatedCar.photos as string[])[0] || '/placeholder-car.jpg',
-        isAvailable: isAvailable !== undefined ? isAvailable : true,
-        extraEquipment: updatedCar.extraEquipment || [],
+        pricePerDay: updatedCar.pricePerDay,
+        seats: updatedCar.seats,
+        transmission: updatedCar.transmission,
+        color: updatedCar.color,
+        imageUrl: updatedCar.photos[0] || '/placeholder-car.jpg',
+        isAvailable: updatedCar.isAvailable, // Usar el valor real de la base de datos
+        unavailableDates: updatedCar.unavailableDates,
+        extraEquipment: updatedCar.extraEquipment,
       },
     });
   } catch (err) {
@@ -475,6 +525,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
         description: description || null,
         photos: photoPaths,
         extraEquipment: extraEquipment || [],
+        isAvailable: true, // Valor por defecto
       },
     });
 
@@ -519,8 +570,19 @@ router.patch('/:id/availability', authenticateToken, isHost, async (req: AuthReq
     res.status(200).json({
       success: true,
       car: {
-        ...updatedCar,
-        unavailableDates: updatedCar.unavailableDates || [],
+        id: updatedCar.id,
+        brand: updatedCar.brand,
+        model: updatedCar.model,
+        year: updatedCar.year,
+        category: updatedCar.carType,
+        pricePerDay: updatedCar.pricePerDay,
+        seats: updatedCar.seats,
+        transmission: updatedCar.transmission,
+        color: updatedCar.color,
+        imageUrl: updatedCar.photos[0] || '/placeholder-car.jpg',
+        isAvailable: updatedCar.isAvailable, // Usar el valor real de la base de datos
+        unavailableDates: updatedCar.unavailableDates,
+        extraEquipment: updatedCar.extraEquipment,
       },
     });
   } catch (err) {

@@ -2319,6 +2319,7 @@ export namespace Prisma {
     rentalCount: number | null
     rating: number | null
     discount: number | null
+    isAvailable: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2342,6 +2343,7 @@ export namespace Prisma {
     rentalCount: number | null
     rating: number | null
     discount: number | null
+    isAvailable: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2368,6 +2370,7 @@ export namespace Prisma {
     discount: number
     unavailableDates: number
     extraEquipment: number
+    isAvailable: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2415,6 +2418,7 @@ export namespace Prisma {
     rentalCount?: true
     rating?: true
     discount?: true
+    isAvailable?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2438,6 +2442,7 @@ export namespace Prisma {
     rentalCount?: true
     rating?: true
     discount?: true
+    isAvailable?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2464,6 +2469,7 @@ export namespace Prisma {
     discount?: true
     unavailableDates?: true
     extraEquipment?: true
+    isAvailable?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2571,12 +2577,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description: string | null
-    photos: JsonValue
+    photos: string[]
     rentalCount: number
     rating: number
     discount: number
-    unavailableDates: JsonValue | null
-    extraEquipment: JsonValue | null
+    unavailableDates: string[]
+    extraEquipment: string[]
+    isAvailable: boolean
     createdAt: Date
     updatedAt: Date
     _count: CarCountAggregateOutputType | null
@@ -2622,6 +2629,7 @@ export namespace Prisma {
     discount?: boolean
     unavailableDates?: boolean
     extraEquipment?: boolean
+    isAvailable?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -2651,6 +2659,7 @@ export namespace Prisma {
     discount?: boolean
     unavailableDates?: boolean
     extraEquipment?: boolean
+    isAvailable?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -2678,6 +2687,7 @@ export namespace Prisma {
     discount?: boolean
     unavailableDates?: boolean
     extraEquipment?: boolean
+    isAvailable?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -2705,11 +2715,12 @@ export namespace Prisma {
     discount?: boolean
     unavailableDates?: boolean
     extraEquipment?: boolean
+    isAvailable?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CarOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "location" | "brand" | "model" | "year" | "carType" | "color" | "pricePerDay" | "kilometers" | "licensePlate" | "transmission" | "fuelType" | "seats" | "description" | "photos" | "rentalCount" | "rating" | "discount" | "unavailableDates" | "extraEquipment" | "createdAt" | "updatedAt", ExtArgs["result"]["car"]>
+  export type CarOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "location" | "brand" | "model" | "year" | "carType" | "color" | "pricePerDay" | "kilometers" | "licensePlate" | "transmission" | "fuelType" | "seats" | "description" | "photos" | "rentalCount" | "rating" | "discount" | "unavailableDates" | "extraEquipment" | "isAvailable" | "createdAt" | "updatedAt", ExtArgs["result"]["car"]>
   export type CarInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     rentals?: boolean | Car$rentalsArgs<ExtArgs>
@@ -2744,12 +2755,13 @@ export namespace Prisma {
       fuelType: string
       seats: number
       description: string | null
-      photos: Prisma.JsonValue
+      photos: string[]
       rentalCount: number
       rating: number
       discount: number
-      unavailableDates: Prisma.JsonValue | null
-      extraEquipment: Prisma.JsonValue | null
+      unavailableDates: string[]
+      extraEquipment: string[]
+      isAvailable: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["car"]>
@@ -3192,12 +3204,13 @@ export namespace Prisma {
     readonly fuelType: FieldRef<"Car", 'String'>
     readonly seats: FieldRef<"Car", 'Int'>
     readonly description: FieldRef<"Car", 'String'>
-    readonly photos: FieldRef<"Car", 'Json'>
+    readonly photos: FieldRef<"Car", 'String[]'>
     readonly rentalCount: FieldRef<"Car", 'Int'>
     readonly rating: FieldRef<"Car", 'Float'>
     readonly discount: FieldRef<"Car", 'Float'>
-    readonly unavailableDates: FieldRef<"Car", 'Json'>
-    readonly extraEquipment: FieldRef<"Car", 'Json'>
+    readonly unavailableDates: FieldRef<"Car", 'String[]'>
+    readonly extraEquipment: FieldRef<"Car", 'String[]'>
+    readonly isAvailable: FieldRef<"Car", 'Boolean'>
     readonly createdAt: FieldRef<"Car", 'DateTime'>
     readonly updatedAt: FieldRef<"Car", 'DateTime'>
   }
@@ -4820,6 +4833,7 @@ export namespace Prisma {
     discount: 'discount',
     unavailableDates: 'unavailableDates',
     extraEquipment: 'extraEquipment',
+    isAvailable: 'isAvailable',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -4848,36 +4862,12 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-  export const JsonNullValueInput: {
-    JsonNull: typeof JsonNull
-  };
-
-  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
-  export const NullableJsonNullValueInput: {
-    DbNull: typeof DbNull,
-    JsonNull: typeof JsonNull
-  };
-
-  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
-
-
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
-
-
-  export const JsonNullValueFilter: {
-    DbNull: typeof DbNull,
-    JsonNull: typeof JsonNull,
-    AnyNull: typeof AnyNull
-  };
-
-  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   export const NullsOrder: {
@@ -4950,16 +4940,9 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
+   * Reference to a field of type 'Boolean'
    */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
   /**
    * Deep Input Types
@@ -5050,12 +5033,13 @@ export namespace Prisma {
     fuelType?: StringFilter<"Car"> | string
     seats?: IntFilter<"Car"> | number
     description?: StringNullableFilter<"Car"> | string | null
-    photos?: JsonFilter<"Car">
+    photos?: StringNullableListFilter<"Car">
     rentalCount?: IntFilter<"Car"> | number
     rating?: FloatFilter<"Car"> | number
     discount?: FloatFilter<"Car"> | number
-    unavailableDates?: JsonNullableFilter<"Car">
-    extraEquipment?: JsonNullableFilter<"Car">
+    unavailableDates?: StringNullableListFilter<"Car">
+    extraEquipment?: StringNullableListFilter<"Car">
+    isAvailable?: BoolFilter<"Car"> | boolean
     createdAt?: DateTimeFilter<"Car"> | Date | string
     updatedAt?: DateTimeFilter<"Car"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -5082,8 +5066,9 @@ export namespace Prisma {
     rentalCount?: SortOrder
     rating?: SortOrder
     discount?: SortOrder
-    unavailableDates?: SortOrderInput | SortOrder
-    extraEquipment?: SortOrderInput | SortOrder
+    unavailableDates?: SortOrder
+    extraEquipment?: SortOrder
+    isAvailable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -5109,12 +5094,13 @@ export namespace Prisma {
     fuelType?: StringFilter<"Car"> | string
     seats?: IntFilter<"Car"> | number
     description?: StringNullableFilter<"Car"> | string | null
-    photos?: JsonFilter<"Car">
+    photos?: StringNullableListFilter<"Car">
     rentalCount?: IntFilter<"Car"> | number
     rating?: FloatFilter<"Car"> | number
     discount?: FloatFilter<"Car"> | number
-    unavailableDates?: JsonNullableFilter<"Car">
-    extraEquipment?: JsonNullableFilter<"Car">
+    unavailableDates?: StringNullableListFilter<"Car">
+    extraEquipment?: StringNullableListFilter<"Car">
+    isAvailable?: BoolFilter<"Car"> | boolean
     createdAt?: DateTimeFilter<"Car"> | Date | string
     updatedAt?: DateTimeFilter<"Car"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -5141,8 +5127,9 @@ export namespace Prisma {
     rentalCount?: SortOrder
     rating?: SortOrder
     discount?: SortOrder
-    unavailableDates?: SortOrderInput | SortOrder
-    extraEquipment?: SortOrderInput | SortOrder
+    unavailableDates?: SortOrder
+    extraEquipment?: SortOrder
+    isAvailable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: CarCountOrderByAggregateInput
@@ -5171,12 +5158,13 @@ export namespace Prisma {
     fuelType?: StringWithAggregatesFilter<"Car"> | string
     seats?: IntWithAggregatesFilter<"Car"> | number
     description?: StringNullableWithAggregatesFilter<"Car"> | string | null
-    photos?: JsonWithAggregatesFilter<"Car">
+    photos?: StringNullableListFilter<"Car">
     rentalCount?: IntWithAggregatesFilter<"Car"> | number
     rating?: FloatWithAggregatesFilter<"Car"> | number
     discount?: FloatWithAggregatesFilter<"Car"> | number
-    unavailableDates?: JsonNullableWithAggregatesFilter<"Car">
-    extraEquipment?: JsonNullableWithAggregatesFilter<"Car">
+    unavailableDates?: StringNullableListFilter<"Car">
+    extraEquipment?: StringNullableListFilter<"Car">
+    isAvailable?: BoolWithAggregatesFilter<"Car"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Car"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Car"> | Date | string
   }
@@ -5333,12 +5321,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description?: string | null
-    photos: JsonNullValueInput | InputJsonValue
+    photos?: CarCreatephotosInput | string[]
     rentalCount?: number
     rating?: number
     discount?: number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarCreateunavailableDatesInput | string[]
+    extraEquipment?: CarCreateextraEquipmentInput | string[]
+    isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutCarsInput
@@ -5361,12 +5350,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description?: string | null
-    photos: JsonNullValueInput | InputJsonValue
+    photos?: CarCreatephotosInput | string[]
     rentalCount?: number
     rating?: number
     discount?: number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarCreateunavailableDatesInput | string[]
+    extraEquipment?: CarCreateextraEquipmentInput | string[]
+    isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     rentals?: RentalUncheckedCreateNestedManyWithoutCarInput
@@ -5386,12 +5376,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCarsNestedInput
@@ -5414,12 +5405,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rentals?: RentalUncheckedUpdateManyWithoutCarNestedInput
@@ -5441,12 +5433,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description?: string | null
-    photos: JsonNullValueInput | InputJsonValue
+    photos?: CarCreatephotosInput | string[]
     rentalCount?: number
     rating?: number
     discount?: number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarCreateunavailableDatesInput | string[]
+    extraEquipment?: CarCreateextraEquipmentInput | string[]
+    isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5465,12 +5458,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5491,12 +5485,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5731,51 +5726,18 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type UserScalarRelationFilter = {
@@ -5810,6 +5772,7 @@ export namespace Prisma {
     discount?: SortOrder
     unavailableDates?: SortOrder
     extraEquipment?: SortOrder
+    isAvailable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5844,6 +5807,7 @@ export namespace Prisma {
     rentalCount?: SortOrder
     rating?: SortOrder
     discount?: SortOrder
+    isAvailable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5867,6 +5831,7 @@ export namespace Prisma {
     rentalCount?: SortOrder
     rating?: SortOrder
     discount?: SortOrder
+    isAvailable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5915,57 +5880,13 @@ export namespace Prisma {
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
   }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type CarScalarRelationFilter = {
@@ -6115,6 +6036,18 @@ export namespace Prisma {
     deleteMany?: RentalScalarWhereInput | RentalScalarWhereInput[]
   }
 
+  export type CarCreatephotosInput = {
+    set: string[]
+  }
+
+  export type CarCreateunavailableDatesInput = {
+    set: string[]
+  }
+
+  export type CarCreateextraEquipmentInput = {
+    set: string[]
+  }
+
   export type UserCreateNestedOneWithoutCarsInput = {
     create?: XOR<UserCreateWithoutCarsInput, UserUncheckedCreateWithoutCarsInput>
     connectOrCreate?: UserCreateOrConnectWithoutCarsInput
@@ -6145,6 +6078,25 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type CarUpdatephotosInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type CarUpdateunavailableDatesInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type CarUpdateextraEquipmentInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type UserUpdateOneRequiredWithoutCarsNestedInput = {
@@ -6319,6 +6271,11 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -6362,51 +6319,13 @@ export namespace Prisma {
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
   }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type CarCreateWithoutUserInput = {
@@ -6423,12 +6342,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description?: string | null
-    photos: JsonNullValueInput | InputJsonValue
+    photos?: CarCreatephotosInput | string[]
     rentalCount?: number
     rating?: number
     discount?: number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarCreateunavailableDatesInput | string[]
+    extraEquipment?: CarCreateextraEquipmentInput | string[]
+    isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     rentals?: RentalCreateNestedManyWithoutCarInput
@@ -6449,12 +6369,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description?: string | null
-    photos: JsonNullValueInput | InputJsonValue
+    photos?: CarCreatephotosInput | string[]
     rentalCount?: number
     rating?: number
     discount?: number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarCreateunavailableDatesInput | string[]
+    extraEquipment?: CarCreateextraEquipmentInput | string[]
+    isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     rentals?: RentalUncheckedCreateNestedManyWithoutCarInput
@@ -6532,12 +6453,13 @@ export namespace Prisma {
     fuelType?: StringFilter<"Car"> | string
     seats?: IntFilter<"Car"> | number
     description?: StringNullableFilter<"Car"> | string | null
-    photos?: JsonFilter<"Car">
+    photos?: StringNullableListFilter<"Car">
     rentalCount?: IntFilter<"Car"> | number
     rating?: FloatFilter<"Car"> | number
     discount?: FloatFilter<"Car"> | number
-    unavailableDates?: JsonNullableFilter<"Car">
-    extraEquipment?: JsonNullableFilter<"Car">
+    unavailableDates?: StringNullableListFilter<"Car">
+    extraEquipment?: StringNullableListFilter<"Car">
+    isAvailable?: BoolFilter<"Car"> | boolean
     createdAt?: DateTimeFilter<"Car"> | Date | string
     updatedAt?: DateTimeFilter<"Car"> | Date | string
   }
@@ -6682,12 +6604,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description?: string | null
-    photos: JsonNullValueInput | InputJsonValue
+    photos?: CarCreatephotosInput | string[]
     rentalCount?: number
     rating?: number
     discount?: number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarCreateunavailableDatesInput | string[]
+    extraEquipment?: CarCreateextraEquipmentInput | string[]
+    isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutCarsInput
@@ -6709,12 +6632,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description?: string | null
-    photos: JsonNullValueInput | InputJsonValue
+    photos?: CarCreatephotosInput | string[]
     rentalCount?: number
     rating?: number
     discount?: number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarCreateunavailableDatesInput | string[]
+    extraEquipment?: CarCreateextraEquipmentInput | string[]
+    isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6773,12 +6697,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCarsNestedInput
@@ -6800,12 +6725,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6855,12 +6781,13 @@ export namespace Prisma {
     fuelType: string
     seats: number
     description?: string | null
-    photos: JsonNullValueInput | InputJsonValue
+    photos?: CarCreatephotosInput | string[]
     rentalCount?: number
     rating?: number
     discount?: number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarCreateunavailableDatesInput | string[]
+    extraEquipment?: CarCreateextraEquipmentInput | string[]
+    isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6888,12 +6815,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rentals?: RentalUpdateManyWithoutCarNestedInput
@@ -6914,12 +6842,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rentals?: RentalUncheckedUpdateManyWithoutCarNestedInput
@@ -6940,12 +6869,13 @@ export namespace Prisma {
     fuelType?: StringFieldUpdateOperationsInput | string
     seats?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    photos?: JsonNullValueInput | InputJsonValue
+    photos?: CarUpdatephotosInput | string[]
     rentalCount?: IntFieldUpdateOperationsInput | number
     rating?: FloatFieldUpdateOperationsInput | number
     discount?: FloatFieldUpdateOperationsInput | number
-    unavailableDates?: NullableJsonNullValueInput | InputJsonValue
-    extraEquipment?: NullableJsonNullValueInput | InputJsonValue
+    unavailableDates?: CarUpdateunavailableDatesInput | string[]
+    extraEquipment?: CarUpdateextraEquipmentInput | string[]
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

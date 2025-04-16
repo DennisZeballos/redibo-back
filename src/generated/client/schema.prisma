@@ -36,13 +36,14 @@ model Car {
   fuelType         String
   seats            Int
   description      String?
-  photos           Json
+  photos           String[] @default([]) // Cambiado de Json a String[]
   rentalCount      Int      @default(0)
   rating           Float    @default(0)
   discount         Float    @default(0)
   rentals          Rental[]
-  unavailableDates Json? // HU 7
-  extraEquipment   Json? // HU 8
+  unavailableDates String[] @default([]) // Cambiado de Json a String[]
+  extraEquipment   String[] @default([]) // Cambiado de Json a String[]
+  isAvailable      Boolean  @default(true) // Nuevo campo
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
