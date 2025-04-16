@@ -1,7 +1,10 @@
-import express, { Response, NextFunction, RequestHandler } from 'express';
-import { PrismaClient } from '@prisma/client';
-import fileUpload, { UploadedFile } from 'express-fileupload';
-import path from 'path';
+import * as express from 'express';
+/*import { PrismaClient, Prisma } from '@prisma/client';*/
+import { PrismaClient, Prisma } from '../generated/client';
+/*import * as fileUpload from 'express-fileupload';*/
+import fileUpload from 'express-fileupload';
+import { UploadedFile } from 'express-fileupload';
+import * as path from 'path';
 import { AuthRequest, authenticateToken, isHost } from '../middlewares/auth';
 
 const router = express.Router();
@@ -21,26 +24,223 @@ interface CarRequestBody {
   fuelType: string;
   seats: string;
   description?: string;
+  photoUrls?: string[];
+  extraEquipment?: string[];
 }
 
 interface UploadedPhoto extends UploadedFile {
   mv(path: string): Promise<void>;
 }
 
-router.use(fileUpload());
+router.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 },
+  abortOnLimit: true,
+  createParentPath: true,
+  safeFileNames: true,
+  useTempFiles: true,
+  tempFileDir: './tmp',
+}));
 
-router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+// GET /api/cars - Listar autos con filtros, búsqueda y ordenamiento
+router.get('/', async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
+  try {
+    const {
+      location,
+      startDate,
+      endDate,
+      hostId,
+      carType,
+      transmission,
+      fuelType,
+      minPrice,
+      maxPrice,
+      sortBy = 'relevance',
+      page = '1',
+      search,
+    } = req.query;
+
+    const pageNumber = parseInt(page as string) || 1;
+    const limit = 10;
+    const skip = (pageNumber - 1) * limit;
+
+    const where: Prisma.CarWhereInput = {};
+
+    if (location) {
+      where.location = { contains: location as string, mode: 'insensitive' };
+    }
+
+    if (hostId) {
+      where.userId = parseInt(hostId as string);
+    }
+
+    if (carType) {
+      where.carType = { equals: carType as string };
+    }
+
+    if (transmission) {
+      where.transmission = { equals: transmission as string };
+    }
+
+    if (fuelType) {
+      where.fuelType = { equals: fuelType as string };
+    }
+
+    if (minPrice || maxPrice) {
+      where.pricePerDay = {};
+      if (minPrice) {
+        where.pricePerDay.gte = parseFloat(minPrice as string);
+      }
+      if (maxPrice) {
+        where.pricePerDay.lte = parseFloat(maxPrice as string);
+      }
+    }
+
+    if (startDate && endDate) {
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+
+      where.NOT = {
+        rentals: {
+          some: {
+            AND: [
+              { startDate: { lte: end } },
+              { endDate: { gte: start } },
+            ],
+          },
+        },
+      };
+    }
+
+    if (search) {
+      const searchTerm = search as string;
+      where.OR = [
+        { brand: { contains: searchTerm, mode: 'insensitive' } },
+        { model: { contains: searchTerm, mode: 'insensitive' } },
+        { description: { contains: searchTerm, mode: 'insensitive' } },
+        { carType: { contains: searchTerm, mode: 'insensitive' } },
+        { transmission: { contains: searchTerm, mode: 'insensitive' } },
+        { fuelType: { contains: searchTerm, mode: 'insensitive' } },
+      ];
+    }
+
+    let orderBy: Prisma.CarOrderByWithRelationInput = {};
+    switch (sortBy) {
+      case 'priceAsc':
+        orderBy = { pricePerDay: 'asc' };
+        break;
+      case 'priceDesc':
+        orderBy = { pricePerDay: 'desc' };
+        break;
+      case 'relevance':
+      default:
+        orderBy = { createdAt: 'desc' }; // Simplificamos el ordenamiento por ahora
+        break;
+    }
+
+    const totalCars = await db.car.count({ where });
+    const cars = await db.car.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy,
+      select: {
+        id: true,
+        brand: true,
+        model: true,
+        year: true,
+        carType: true,
+        pricePerDay: true,
+        rentalCount: true,
+        location: true,
+        photos: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    const totalPages = Math.ceil(totalCars / limit);
+
+    res.status(200).json({
+      cars: cars.map(car => ({
+        id: car.id,
+        brand: car.brand,
+        model: car.model,
+        year: car.year,
+        category: car.carType,
+        pricePerDay: car.pricePerDay,
+        rentalCount: car.rentalCount,
+        location: car.location,
+        imageUrl: (car.photos as string[])[0] || '/placeholder-car.jpg',
+        host: {
+          id: car.user.id,
+          email: car.user.email,
+        },
+      })),
+      totalCars,
+      currentPage: pageNumber,
+      totalPages,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/cars/my-cars - Listar autos del host con filtros y ordenamiento (HU 3)
+router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
     const page = parseInt(req.query.page as string) || 1;
+    const { brand, model, carType, transmission, sortBy } = req.query;
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    const totalCars = await db.car.count({ where: { userId } });
+    const where: Prisma.CarWhereInput = { userId };
+
+    if (brand) {
+      where.brand = { contains: brand as string, mode: 'insensitive' };
+    }
+    if (model) {
+      where.model = { contains: model as string, mode: 'insensitive' };
+    }
+    if (carType) {
+      where.carType = { equals: carType as string };
+    }
+    if (transmission) {
+      where.transmission = { equals: transmission as string };
+    }
+
+    let orderBy: Prisma.CarOrderByWithRelationInput = {};
+    switch (sortBy) {
+      case 'priceAsc':
+        orderBy = { pricePerDay: 'asc' };
+        break;
+      case 'priceDesc':
+        orderBy = { pricePerDay: 'desc' };
+        break;
+      case 'rentalCount':
+        orderBy = { rentalCount: 'desc' };
+        break;
+      case 'yearAsc':
+        orderBy = { year: 'asc' };
+        break;
+      case 'yearDesc':
+        orderBy = { year: 'desc' };
+        break;
+      default:
+        orderBy = { createdAt: 'desc' };
+        break;
+    }
+
+    const totalCars = await db.car.count({ where });
     const cars = await db.car.findMany({
-      where: { userId },
+      where,
       skip,
       take: limit,
+      orderBy,
       select: {
         id: true,
         brand: true,
@@ -53,6 +253,9 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: Response
         transmission: true,
         photos: true,
         createdAt: true,
+        unavailableDates: true,
+        extraEquipment: true,
+        rentalCount: true,
       },
     });
 
@@ -62,8 +265,10 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: Response
       cars: cars.map(car => ({
         ...car,
         category: car.carType,
-        imageUrl: car.photos[0] || '/placeholder-car.jpg',
+        imageUrl: (car.photos as string[])[0] || '/placeholder-car.jpg',
         isAvailable: true,
+        unavailableDates: car.unavailableDates || [],
+        extraEquipment: car.extraEquipment || [],
       })),
       totalCars,
       currentPage: page,
@@ -74,7 +279,8 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: Response
   }
 });
 
-router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+// GET /api/cars/:id - Obtener detalles de un auto
+router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const carId = parseInt(req.params.id);
     const car = await db.car.findUnique({
@@ -91,6 +297,8 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response, ne
         transmission: true,
         photos: true,
         createdAt: true,
+        unavailableDates: true,
+        extraEquipment: true,
       },
     });
 
@@ -102,15 +310,18 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response, ne
     res.status(200).json({
       ...car,
       category: car.carType,
-      imageUrl: car.photos[0] || '/placeholder-car.jpg',
+      imageUrl: (car.photos as string[])[0] || '/placeholder-car.jpg',
       isAvailable: true,
+      unavailableDates: car.unavailableDates || [],
+      extraEquipment: car.extraEquipment || [],
     });
   } catch (err) {
     next(err);
   }
 });
 
-router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+// DELETE /api/cars/:id - Eliminar un auto
+router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const carId = parseInt(req.params.id);
     const car = await db.car.findUnique({ where: { id: carId } });
@@ -132,7 +343,8 @@ router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: R
   }
 });
 
-router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+// PUT /api/cars/:id - Actualizar un auto
+router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const carId = parseInt(req.params.id);
     const car = await db.car.findUnique({ where: { id: carId } });
@@ -158,6 +370,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: Resp
       transmission,
       imageUrl,
       isAvailable,
+      extraEquipment,
     } = req.body;
 
     const updatedCar = await db.car.update({
@@ -171,7 +384,8 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: Resp
         pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
         seats: seats ? parseInt(seats) : car.seats,
         transmission: transmission || car.transmission,
-        photos: imageUrl ? [imageUrl] : car.photos,
+        photos: imageUrl ? [imageUrl] : (car.photos || []), // Si car.photos es null, usa un array vacío
+        extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
       },
     });
 
@@ -180,8 +394,9 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: Resp
       car: {
         ...updatedCar,
         category: updatedCar.carType,
-        imageUrl: updatedCar.photos[0] || '/placeholder-car.jpg',
+        imageUrl: (updatedCar.photos as string[])[0] || '/placeholder-car.jpg',
         isAvailable: isAvailable !== undefined ? isAvailable : true,
+        extraEquipment: updatedCar.extraEquipment || [],
       },
     });
   } catch (err) {
@@ -189,7 +404,8 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: Resp
   }
 });
 
-router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+// POST /api/cars - Crear un auto
+router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const {
       location,
@@ -205,6 +421,8 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Respon
       fuelType,
       seats,
       description,
+      photoUrls,
+      extraEquipment,
     } = req.body as CarRequestBody;
 
     if (!location || !brand || !year || !pricePerDay || !kilometers || !licensePlate || !transmission || !fuelType || !seats) {
@@ -212,25 +430,31 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Respon
       return;
     }
 
-    if (!req.files || !req.files.photos) {
-      res.status(400).json({ error: 'Debes subir al menos 3 fotos' });
+    let photoPaths: string[] = [];
+    if (photoUrls && Array.isArray(photoUrls)) {
+      if (photoUrls.length < 3 || photoUrls.length > 5) {
+        res.status(400).json({ error: 'Debes proporcionar entre 3 y 5 URLs de fotos' });
+        return;
+      }
+      photoPaths = photoUrls;
+    } else if (req.files && req.files.photos) {
+      const photoFiles = req.files.photos;
+      const photos: UploadedPhoto[] = Array.isArray(photoFiles) ? photoFiles : [photoFiles as UploadedPhoto];
+
+      if (photos.length < 3 || photos.length > 5) {
+        res.status(400).json({ error: 'Debes subir entre 3 y 5 fotos' });
+        return;
+      }
+
+      for (const photo of photos) {
+        const fileName = `${Date.now()}-${photo.name}`;
+        const filePath = path.join(__dirname, '../../Uploads', fileName);
+        await photo.mv(filePath);
+        photoPaths.push(`/uploads/${fileName}`);
+      }
+    } else {
+      res.status(400).json({ error: 'Debes subir al menos 3 fotos o proporcionar URLs' });
       return;
-    }
-
-    const photoFiles = req.files.photos;
-    const photos: UploadedPhoto[] = Array.isArray(photoFiles) ? photoFiles : [photoFiles as UploadedPhoto];
-
-    if (photos.length < 3 || photos.length > 5) {
-      res.status(400).json({ error: 'Debes subir entre 3 y 5 fotos' });
-      return;
-    }
-
-    const photoPaths: string[] = [];
-    for (const photo of photos) {
-      const fileName = `${Date.now()}-${photo.name}`;
-      const filePath = path.join(__dirname, '../../Uploads', fileName);
-      await photo.mv(filePath);
-      photoPaths.push(`/Uploads/${fileName}`);
     }
 
     const newCar = await db.car.create({
@@ -250,10 +474,55 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: Respon
         seats: parseInt(seats),
         description: description || null,
         photos: photoPaths,
+        extraEquipment: extraEquipment || [],
       },
     });
 
     res.status(201).json({ success: true, car: newCar });
+  } catch (err: any) {
+    console.error('Error en POST /api/cars:', err.message, err.stack);
+    res.status(500).json({ error: 'Error interno del servidor', details: err.message });
+    next(err);
+  }
+});
+
+// PATCH /api/cars/:id/availability - Actualizar fechas de no disponibilidad
+router.patch('/:id/availability', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
+  try {
+    const carId = parseInt(req.params.id);
+    const { unavailableDates } = req.body;
+
+    const car = await db.car.findUnique({ where: { id: carId } });
+
+    if (!car) {
+      res.status(404).json({ error: 'Auto no encontrado' });
+      return;
+    }
+
+    if (car.userId !== req.user!.id) {
+      res.status(403).json({ error: 'No autorizado para actualizar este auto' });
+      return;
+    }
+
+    if (!Array.isArray(unavailableDates)) {
+      res.status(400).json({ error: 'unavailableDates debe ser un arreglo de fechas' });
+      return;
+    }
+
+    const updatedCar = await db.car.update({
+      where: { id: carId },
+      data: {
+        unavailableDates,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      car: {
+        ...updatedCar,
+        unavailableDates: updatedCar.unavailableDates || [],
+      },
+    });
   } catch (err) {
     next(err);
   }
