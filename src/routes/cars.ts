@@ -78,7 +78,10 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     }
 
     if (transmission) {
-      where.transmission = { equals: transmission as string };
+      where.transmission = {
+        equals: transmission as string,
+        mode: 'insensitive',
+      };
     }
 
     if (fuelType) {
@@ -477,6 +480,17 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
 
     if (!location || !brand || !year || !pricePerDay || !kilometers || !licensePlate || !transmission || !fuelType || !seats) {
       res.status(400).json({ error: 'Faltan campos obligatorios' });
+      return;
+    }
+
+    const placaRepetida = await db.car.findFirst({
+      where: {
+        licensePlate
+      },
+    });
+    
+    if (placaRepetida) {
+      res.status(409).json({ message: 'La placa de este auto ya está registrada' });
       return;
     }
 

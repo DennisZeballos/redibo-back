@@ -168,7 +168,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\DELL\\Documents\\BRYAN VASQUEZ\\UMSS\\I - 2025\\IS\\ProyectoIS\\RediBo_Back\\src\\generated\\client",
+      "value": "C:\\Users\\hp\\Desktop\\RediBo_Back\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -182,7 +182,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\DELL\\Documents\\BRYAN VASQUEZ\\UMSS\\I - 2025\\IS\\ProyectoIS\\RediBo_Back\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\hp\\Desktop\\RediBo_Back\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -196,11 +196,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://postgres:root@localhost:5432/redibo?schema=public"
+        "value": null
       }
     }
   },
