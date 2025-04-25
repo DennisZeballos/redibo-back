@@ -210,7 +210,7 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
     const userId = req.user!.id;
     const page = parseInt(req.query.page as string) || 1;
     const { brand, model, carType, transmission, sortBy } = req.query;
-    const limit = 10;
+    const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
     const where: Prisma.CarWhereInput = { userId };
