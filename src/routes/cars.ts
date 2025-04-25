@@ -60,7 +60,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     } = req.query;
 
     const pageNumber = parseInt(page as string) || 1;
-    const limit = 10;
+    const limit = parseInt(req.query.limit as string) || 10;
     const skip = (pageNumber - 1) * limit;
 
     const where: Prisma.CarWhereInput = {};
