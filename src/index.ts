@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import fileUpload from 'express-fileupload';
+import fileUpload from 'express';
 import carRoutes from './routes/cars';
 import authRoutes from './routes/auth';
 import path from 'path';
