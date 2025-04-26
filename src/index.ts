@@ -4,10 +4,14 @@ import fileUpload from 'express';
 import carRoutes from './routes/cars';
 import authRoutes from './routes/auth';
 import path from 'path';
+import cors from 'cors';
+
 
 dotenv.config();
 
 const app = express();
+
+app.use(cors())
 
 // Middleware
 app.use(express.json());
@@ -37,3 +41,8 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
+app.get('/', (req, res) => {
+  res.json('server running');
+  
+})

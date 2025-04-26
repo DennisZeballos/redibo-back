@@ -66,7 +66,7 @@ async function main() {
         seats: 5,
         description: 'Un auto confiable para la ciudad.',
         photos: [
-          'https://example.com/toyota-corolla-1.jpg',
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcMbFiY4fmFk1PulbZSeXqFbdIBR1XdpaXgQ&s',
           'https://example.com/toyota-corolla-2.jpg',
           'https://example.com/toyota-corolla-3.jpg',
         ],
@@ -93,7 +93,7 @@ async function main() {
         seats: 5,
         description: 'Ideal para viajes largos.',
         photos: [
-          'https://example.com/citroen-c3-1.jpg',
+          'https://hips.hearstapps.com/hmg-prod/images/citroen-c3-2020-1600-01-1581430396.jpg?crop=0.751xw:1.00xh;0.109xw,0&resize=1200:*',
           'https://example.com/citroen-c3-2.jpg',
           'https://example.com/citroen-c3-3.jpg',
         ],
@@ -120,7 +120,7 @@ async function main() {
         seats: 4,
         description: 'Compacto y eficiente.',
         photos: [
-          'https://example.com/toyota-yaris-1.jpg',
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTev3kX4OPmjmOTj3WNZlOG7ozz9Ljb8JrtA&s',
           'https://example.com/toyota-yaris-2.jpg',
           'https://example.com/toyota-yaris-3.jpg',
         ],
@@ -147,7 +147,7 @@ async function main() {
         seats: 5,
         description: 'Perfecto para la ciudad.',
         photos: [
-          'https://example.com/kia-rio-1.jpg',
+          'https://acnews.blob.core.windows.net/imgnews/paragraph/NPAZ_c2c79ee26ec34de58da238572f80f588.jpg',
           'https://example.com/kia-rio-2.jpg',
           'https://example.com/kia-rio-3.jpg',
         ],
@@ -174,7 +174,7 @@ async function main() {
         seats: 5,
         description: 'Espacioso y cómodo.',
         photos: [
-          'https://example.com/kia-cerato-1.jpg',
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOwtJg_woM0OLFZRDu2SwA1h5CKLt5q0zRhg&s',
           'https://example.com/kia-cerato-2.jpg',
           'https://example.com/kia-cerato-3.jpg',
         ],
@@ -201,7 +201,7 @@ async function main() {
         seats: 5,
         description: 'Ideal para aventuras.',
         photos: [
-          'https://example.com/hyundai-tucson-1.jpg',
+          'https://autoproyecto.com/wp-content/uploads/2020/09/43086-2022Tucson.jpg.webp',
           'https://example.com/hyundai-tucson-2.jpg',
           'https://example.com/hyundai-tucson-3.jpg',
         ],

@@ -167,7 +167,11 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
+<<<<<<< HEAD
       "value": "C:\\Users\\USUARIO\\Downloads\\Is_2025\\RediBo_Back\\src\\generated\\client",
+=======
+      "value": "C:\\Users\\hp\\Desktop\\RediBo_Back\\src\\generated\\client",
+>>>>>>> eac061ae83d82b9cbb6f44d66bfe0b9008c21f62
       "fromEnvVar": null
     },
     "config": {
@@ -181,7 +185,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
+<<<<<<< HEAD
     "sourceFilePath": "C:\\Users\\USUARIO\\Downloads\\Is_2025\\RediBo_Back\\prisma\\schema.prisma",
+=======
+    "sourceFilePath": "C:\\Users\\hp\\Desktop\\RediBo_Back\\prisma\\schema.prisma",
+>>>>>>> eac061ae83d82b9cbb6f44d66bfe0b9008c21f62
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -195,11 +203,16 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
+<<<<<<< HEAD
         "value": "postgresql://postgres:fuentesCejas@localhost:5433/Redibo?schema=public"
+=======
+        "value": null
+>>>>>>> eac061ae83d82b9cbb6f44d66bfe0b9008c21f62
       }
     }
   },

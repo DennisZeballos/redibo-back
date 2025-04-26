@@ -60,7 +60,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     } = req.query;
 
     const pageNumber = parseInt(page as string) || 1;
-    const limit = 10;
+    const limit = parseInt(req.query.limit as string) || 10;
     const skip = (pageNumber - 1) * limit;
 
     const where: Prisma.CarWhereInput = {};
@@ -78,7 +78,10 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     }
 
     if (transmission) {
-      where.transmission = { equals: transmission as string };
+      where.transmission = {
+        equals: transmission as string,
+        mode: 'insensitive',
+      };
     }
 
     if (fuelType) {
@@ -207,7 +210,7 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
     const userId = req.user!.id;
     const page = parseInt(req.query.page as string) || 1;
     const { brand, model, carType, transmission, sortBy } = req.query;
-    const limit = 10;
+    const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
     const where: Prisma.CarWhereInput = { userId };
@@ -477,6 +480,17 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
 
     if (!location || !brand || !year || !pricePerDay || !kilometers || !licensePlate || !transmission || !fuelType || !seats) {
       res.status(400).json({ error: 'Faltan campos obligatorios' });
+      return;
+    }
+
+    const placaRepetida = await db.car.findFirst({
+      where: {
+        licensePlate
+      },
+    });
+    
+    if (placaRepetida) {
+      res.status(409).json({ message: 'La placa de este auto ya está registrada' });
       return;
     }
 
