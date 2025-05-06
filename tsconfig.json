@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2020", /* Mantener ES2020 para compatibilidad con Node.js */
+    "lib": ["ES2020", "ESNext"], /* Incluir ESNext para características modernas */
+    
+    /* Modules */
+    "module": "commonjs", /* CommonJS para Node.js */
+    "moduleResolution": "node", /* Asegurar resolución de módulos estilo Node.js */
+    "rootDir": ".", /* Carpeta fuente */
+    "outDir": "./dist", /* Carpeta de salida */
+    "baseUrl": ".", /* Base para resolución de módulos */
+    "paths": {
+      "@/*": ["src/*"] /* Alias para src */
+    },
+    "resolveJsonModule": true, /* Permitir importar archivos JSON */
+    "esModuleInterop": true, /* Soporte para importaciones CommonJS */
+    "forceConsistentCasingInFileNames": true, /* Evitar problemas de mayúsculas/minúsculas */
+    
+    /* Type Checking */
+    "strict": true, /* Habilitar verificaciones estrictas */
+    "skipLibCheck": true, /* Evitar verificar archivos .d.ts de terceros */
+    
+    /* Emit */
+    "sourceMap": true, /* Generar mapas de origen para depuración */
+    "noEmitOnError": true /* No emitir si hay errores de tipo */
+  },
+  "include": ["src/**/*", "prisma/**/*"], /* Incluir src y prisma para seed.ts */
+  "exclude": ["node_modules", "dist"]
+}

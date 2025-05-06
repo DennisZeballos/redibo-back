@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String
+  cars      Car[]
+  rentals   Rental[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Car {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+  location        String
+  brand           String
+  model           String?
+  year            Int
+  carType         String?
+  color           String?
+  pricePerDay     Float
+  kilometers      String
+  licensePlate    String
+  transmission    String
+  fuelType        String
+  seats           Int
+  description     String?
+  photos          String[] @default([]) // Cambiado de Json a String[]
+  rentalCount     Int      @default(0)
+  rating          Float    @default(0)
+  discount        Float    @default(0)
+  rentals         Rental[]
+  unavailableDates String[] @default([]) // Cambiado de Json a String[]
+  extraEquipment  String[] @default([]) // Cambiado de Json a String[]
+  isAvailable     Boolean  @default(true) // Nuevo campo
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Rental {
+  id        Int      @id @default(autoincrement())
+  carId     Int
+  car       Car      @relation(fields: [carId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+
+
+
+
+
