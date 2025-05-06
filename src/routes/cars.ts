@@ -194,6 +194,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         transmission: car.transmission,
         color: car.color,
         isAvailable: car.isAvailable, // Usar el valor real de la base de datos
+        
       })),
       totalCars,
       currentPage: pageNumber,
@@ -415,6 +416,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       imageUrl,
       isAvailable,
       extraEquipment,
+      description,
     } = req.body;
 
     const updatedCar = await db.car.update({
@@ -431,6 +433,8 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         photos: imageUrl ? [imageUrl] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
         isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable, // Nuevo campo
+        description: description || car.description,
+
       },
     });
 
@@ -450,6 +454,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         isAvailable: updatedCar.isAvailable, // Usar el valor real de la base de datos
         unavailableDates: updatedCar.unavailableDates,
         extraEquipment: updatedCar.extraEquipment,
+        description: updatedCar.description,
       },
     });
   } catch (err) {
