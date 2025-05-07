@@ -90,6 +90,36 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
       where.fuelType = { equals: fuelType as string };
     }
 
+    // Capacidad (asientos)
+    if (req.query.capacidad) {
+      const capacidad = req.query.capacidad as string;
+      if (capacidad === '1 a 2 personas') {
+        where.seats = { lte: 2 };
+      } else if (capacidad === '3 a 5 personas') {
+        where.seats = { gte: 3, lte: 5 };
+      } else if (capacidad === '6 o más') {
+        where.seats = { gte: 6 };
+      }
+    }
+
+    // Color
+    if (req.query.color) {
+      where.color = { equals: req.query.color as string, mode: 'insensitive' };
+    }
+
+    // Kilometrajes
+    if (req.query.kilometrajes) {
+      const km = req.query.kilometrajes as string;
+    
+      if (km === '0 – 10.000 km') {
+        where.kilometers = { lte: '10000' };
+      } else if (km === '10.000 – 50.000 km') {
+        where.kilometers = { gte: '10000', lte: '50000' };
+      } else if (km === 'más de 50.000 km') {
+        where.kilometers = { gte: '50000' };
+      }
+    }   
+
     if (minPrice || maxPrice) {
       where.pricePerDay = {};
       if (minPrice) {
@@ -332,7 +362,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
         licensePlate: true,
         fuelType: true,
         description: true,
-        isAvailable: true, // Nuevo campo
+        isAvailable: true, 
       },
     });
 
@@ -419,8 +449,10 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       isAvailable,
       extraEquipment,
       description,
+      fuelType,
+      kilometers, // 👈 string
     } = req.body;
-
+    
     const updatedCar = await db.car.update({
       where: { id: carId },
       data: {
@@ -432,13 +464,16 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
         seats: seats ? parseInt(seats) : car.seats,
         transmission: transmission || car.transmission,
+        fuelType: fuelType || car.fuelType, // ✅ string
+        kilometers: kilometers || car.kilometers, // ✅ mantener como string
         photos: Array.isArray(imageUrl) ? imageUrl : imageUrl ? [imageUrl] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
-        isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable, // Nuevo campo
+        isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable,
         description: description || car.description,
-
       },
     });
+    
+    
 
     res.status(200).json({
       success: true,

@@ -91,3 +91,21 @@ Repositorio para el desarrollo Back-end de la aplicación web RediBo. Este proye
   ```bash
   pnpm prisma:studio
   ```
+
+
+Para este desplegado se tiene que borrar/comentar esta linea del schema.primsa
+  output   = "../src/generated/client"
+para que el prisma client lo bote dentor de node_modules directamente
+
+Al momento de importar desde cualquier archivo ya sea auth.ts , cars.ts , etc en lugar de 
+importar asi
+   import { PrismaClient, Prisma } from '../generated/client';
+importar de esta manera
+   import {PrismaClient, Prisma} from '@prisma/client';
+
+
+**** Para hacer un pull ****
+primero:
+   git fetch upstream nombre-de-la-rama
+luego:
+   git merge upstream/nomre-de-la-rama
