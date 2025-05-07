@@ -109,3 +109,16 @@ primero:
    git fetch upstream nombre-de-la-rama
 luego:
    git merge upstream/nomre-de-la-rama
+
+
+**** Al momento de cambiar los imports volver a generar la base de datos ****
+si es que se han hecho cambios al esquema de la base de datos usar:
+   pnpm prisma generate dev --name nombre-descriptivo
+
+si solamente se cambiaron los imports pero la base de datos se matiene igual usar:
+   pnpm prisma generate
+
+Aplicar:
+   pnpm prisma migrate reset --force
+si sale algun error en el caso de que se haya hecho cambios en la base de datos y no quiere
+migrar con pnpm prisma generate dev --name nombre-descriptivo
