@@ -360,7 +360,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
         licensePlate: true,
         fuelType: true,
         description: true,
-        isAvailable: true, // Nuevo campo
+        isAvailable: true, 
       },
     });
 
