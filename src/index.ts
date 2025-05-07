@@ -12,7 +12,14 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors())
+// Configuración de CORS
+app.use(cors({
+  origin: 'http://localhost:3000', // Asegúrate de permitir el origen correcto
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true
+}));
+
 
 // Rutas de API
 app.use('/api/hosts', hostRoutes); 
@@ -39,6 +46,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Error interno del servidor' });
 });
+
+app.options('*', cors());
 
 // Iniciar servidor
 const PORT = process.env.PORT || 5000;
