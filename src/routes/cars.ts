@@ -60,7 +60,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     } = req.query;
 
     const pageNumber = parseInt(page as string) || 1;
-    const limit = 10;
+    const limit = parseInt(req.query.limit as string) || 10;
     const skip = (pageNumber - 1) * limit;
 
     const where: Prisma.CarWhereInput = {};
@@ -183,7 +183,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         pricePerDay: car.pricePerDay,
         rentalCount: car.rentalCount,
         location: car.location,
-        imageUrl: car.photos[0] || '/placeholder-car.jpg',
+        imageUrl: car.photos || ['/placeholder-car.jpg'],
         host: {
           id: car.user.id,
           email: car.user.email,
@@ -210,7 +210,7 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
     const userId = req.user!.id;
     const page = parseInt(req.query.page as string) || 1;
     const { brand, model, carType, transmission, sortBy } = req.query;
-    const limit = 10;
+    const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
     const where: Prisma.CarWhereInput = { userId };
@@ -288,7 +288,7 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
         seats: car.seats,
         transmission: car.transmission,
         color: car.color,
-        imageUrl: car.photos[0] || '/placeholder-car.jpg',
+        imageUrl: car.photos || ['/placeholder-car.jpg'],
         isAvailable: car.isAvailable, // Usar el valor real de la base de datos
         unavailableDates: car.unavailableDates,
         extraEquipment: car.extraEquipment,
@@ -348,7 +348,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
       seats: car.seats,
       transmission: car.transmission,
       color: car.color,
-      imageUrl: car.photos[0] || '/placeholder-car.jpg',
+      imageUrl: car.photos,
       isAvailable: car.isAvailable, // Usar el valor real de la base de datos
       unavailableDates: car.unavailableDates,
       extraEquipment: car.extraEquipment,
@@ -428,7 +428,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
         seats: seats ? parseInt(seats) : car.seats,
         transmission: transmission || car.transmission,
-        photos: imageUrl ? [imageUrl] : car.photos,
+        photos: Array.isArray(imageUrl) ? imageUrl : imageUrl ? [imageUrl] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
         isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable, // Nuevo campo
       },
@@ -446,7 +446,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         seats: updatedCar.seats,
         transmission: updatedCar.transmission,
         color: updatedCar.color,
-        imageUrl: updatedCar.photos[0] || '/placeholder-car.jpg',
+        imageUrl: car.photos || ['/placeholder-car.jpg'],
         isAvailable: updatedCar.isAvailable, // Usar el valor real de la base de datos
         unavailableDates: updatedCar.unavailableDates,
         extraEquipment: updatedCar.extraEquipment,
