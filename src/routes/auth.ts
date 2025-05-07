@@ -11,6 +11,9 @@ interface RegisterRequestBody {
   email: string;
   password: string;
   role: string;
+  name: string;
+  location?: string;
+  
 }
 
 interface LoginRequestBody {
@@ -22,9 +25,9 @@ const secret = process.env.JWT_SECRET || 'your_jwt_secret';
 
 router.post('/register', async (req: express.Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { email, password, role } = req.body as RegisterRequestBody;
+    const { email, password, role, name, location } = req.body as RegisterRequestBody;
 
-    if (!email || !password || !role) {
+    if (!email || !password || !role || !name) {
       res.status(400).json({ error: 'Faltan campos obligatorios' });
       return;
     }
@@ -45,18 +48,21 @@ router.post('/register', async (req: express.Request, res: Response, next: NextF
       data: {
         email,
         password: hashedPassword,
+        location: role === 'host' ? location || '' : undefined,
         role,
+        name,
       },
     });
 
     const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '1h' });
 
-    res.status(201).json({ success: true, token, role: user.role }); // Devolvemos el rol
+    res.status(201).json({ success: true, token, role: user.role });
   } catch (err) {
     next(err);
   }
 });
 
+// POST /login
 router.post('/login', async (req: express.Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, password } = req.body as LoginRequestBody;
@@ -80,7 +86,7 @@ router.post('/login', async (req: express.Request, res: Response, next: NextFunc
 
     const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '1h' });
 
-    res.status(200).json({ success: true, token, role: user.role }); // Devolvemos el rol
+    res.status(200).json({ success: true, token, role: user.role });
   } catch (err) {
     next(err);
   }

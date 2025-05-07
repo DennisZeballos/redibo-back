@@ -360,7 +360,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
         licensePlate: true,
         fuelType: true,
         description: true,
-        isAvailable: true, // Nuevo campo
+        isAvailable: true, 
       },
     });
 
@@ -447,8 +447,10 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       isAvailable,
       extraEquipment,
       description,
+      fuelType,
+      kilometers, // 👈 string
     } = req.body;
-
+    
     const updatedCar = await db.car.update({
       where: { id: carId },
       data: {
@@ -460,13 +462,16 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
         seats: seats ? parseInt(seats) : car.seats,
         transmission: transmission || car.transmission,
+        fuelType: fuelType || car.fuelType, // ✅ string
+        kilometers: kilometers || car.kilometers, // ✅ mantener como string
         photos: Array.isArray(imageUrl) ? imageUrl : imageUrl ? [imageUrl] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
-        isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable, // Nuevo campo
+        isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable,
         description: description || car.description,
-
       },
     });
+    
+    
 
     res.status(200).json({
       success: true,

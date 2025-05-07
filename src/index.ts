@@ -1,10 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import fileUpload from 'express';
+import fileUpload from 'express-fileupload'; 
 import carRoutes from './routes/cars';
 import authRoutes from './routes/auth';
 import path from 'path';
 import cors from 'cors';
+import hostRoutes from './routes/hosts';
 
 
 dotenv.config();
@@ -12,6 +13,9 @@ dotenv.config();
 const app = express();
 
 app.use(cors())
+
+// Rutas de API
+app.use('/api/hosts', hostRoutes); 
 
 // Middleware
 app.use(express.json());
