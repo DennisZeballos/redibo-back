@@ -88,6 +88,36 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
       where.fuelType = { equals: fuelType as string };
     }
 
+    // Capacidad (asientos)
+    if (req.query.capacidad) {
+      const capacidad = req.query.capacidad as string;
+      if (capacidad === '1 a 2 personas') {
+        where.seats = { lte: 2 };
+      } else if (capacidad === '3 a 5 personas') {
+        where.seats = { gte: 3, lte: 5 };
+      } else if (capacidad === '6 o más') {
+        where.seats = { gte: 6 };
+      }
+    }
+
+    // Color
+    if (req.query.color) {
+      where.color = { equals: req.query.color as string, mode: 'insensitive' };
+    }
+
+    // Kilometrajes
+    if (req.query.kilometrajes) {
+      const km = req.query.kilometrajes as string;
+    
+      if (km === '0 – 10.000 km') {
+        where.kilometers = { lte: '10000' };
+      } else if (km === '10.000 – 50.000 km') {
+        where.kilometers = { gte: '10000', lte: '50000' };
+      } else if (km === 'más de 50.000 km') {
+        where.kilometers = { gte: '50000' };
+      }
+    }   
+
     if (minPrice || maxPrice) {
       where.pricePerDay = {};
       if (minPrice) {
@@ -194,6 +224,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         transmission: car.transmission,
         color: car.color,
         isAvailable: car.isAvailable, // Usar el valor real de la base de datos
+        
       })),
       totalCars,
       currentPage: pageNumber,
@@ -415,6 +446,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       imageUrl,
       isAvailable,
       extraEquipment,
+      description,
     } = req.body;
 
     const updatedCar = await db.car.update({
@@ -431,6 +463,8 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         photos: Array.isArray(imageUrl) ? imageUrl : imageUrl ? [imageUrl] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
         isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable, // Nuevo campo
+        description: description || car.description,
+
       },
     });
 
@@ -450,6 +484,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         isAvailable: updatedCar.isAvailable, // Usar el valor real de la base de datos
         unavailableDates: updatedCar.unavailableDates,
         extraEquipment: updatedCar.extraEquipment,
+        description: updatedCar.description,
       },
     });
   } catch (err) {
