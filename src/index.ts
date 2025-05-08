@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: 'https://pivotes-front-h4pvc7ay8-bryan-s-projects-9e27ee98.vercel.app',
+  origin: 'https://pivotes-front-h4pvc7qy8-bryan-s-projects-9e27ee98.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true // Si usas cookies o autenticación
