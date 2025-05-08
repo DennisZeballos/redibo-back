@@ -14,6 +14,9 @@ async function main() {
       email: 'host1@example.com',
       password,
       role: 'host',
+      name: 'Luis Santos Agreda de la Cruz',
+      location: 'Cochabamba',
+      
     },
   });
 
@@ -24,6 +27,8 @@ async function main() {
       email: 'host2@example.com',
       password,
       role: 'host',
+      name: 'Mauricio Antonio Rodriguez',
+      location: 'Santa Cruz',
     },
   });
 
@@ -34,6 +39,7 @@ async function main() {
       email: 'guest1@example.com',
       password,
       role: 'guest',
+      name: 'Ana Guest',
     },
   });
 
@@ -44,6 +50,7 @@ async function main() {
       email: 'guest2@example.com',
       password,
       role: 'guest',
+      name: 'Steve Jobs',
     },
   });
 
