@@ -1,12 +1,15 @@
 import * as express from 'express';
-import { PrismaClient, Prisma } from '../generated/client';
+//import { PrismaClient, Prisma } from '../generated/client';
+import {PrismaClient, Prisma} from '@prisma/client';
+import prisma from '../prisma';
+
 import fileUpload from 'express-fileupload';
 import { UploadedFile } from 'express-fileupload';
 import * as path from 'path';
 import { AuthRequest, authenticateToken, isHost } from '../middlewares/auth';
 
 const router = express.Router();
-const db = new PrismaClient();
+//const db = new PrismaClient();
 
 interface CarRequestBody {
   location: string;
@@ -170,8 +173,8 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         break;
     }
 
-    const totalCars = await db.car.count({ where });
-    const cars = await db.car.findMany({
+    const totalCars = await prisma.car.count({ where });
+    const cars = await prisma.car.findMany({
       where,
       skip,
       take: limit,
@@ -281,8 +284,8 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
         break;
     }
 
-    const totalCars = await db.car.count({ where });
-    const cars = await db.car.findMany({
+    const totalCars = await prisma.car.count({ where });
+    const cars = await prisma.car.findMany({
       where,
       skip,
       take: limit,
@@ -338,7 +341,7 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
 router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const carId = parseInt(req.params.id);
-    const car = await db.car.findUnique({
+    const car = await prisma.car.findUnique({
       where: { id: carId },
       select: {
         id: true,
@@ -399,7 +402,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
 router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const carId = parseInt(req.params.id);
-    const car = await db.car.findUnique({ where: { id: carId } });
+    const car = await prisma.car.findUnique({ where: { id: carId } });
 
     if (!car) {
       res.status(404).json({ error: 'Auto no encontrado' });
@@ -411,7 +414,7 @@ router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: e
       return;
     }
 
-    await db.car.delete({ where: { id: carId } });
+    await prisma.car.delete({ where: { id: carId } });
     res.status(200).json({ success: true });
   } catch (err) {
     next(err);
@@ -422,7 +425,7 @@ router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: e
 router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const carId = parseInt(req.params.id);
-    const car = await db.car.findUnique({ where: { id: carId } });
+    const car = await prisma.car.findUnique({ where: { id: carId } });
 
     if (!car) {
       res.status(404).json({ error: 'Auto no encontrado' });
@@ -451,7 +454,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       kilometers, // 👈 string
     } = req.body;
     
-    const updatedCar = await db.car.update({
+    const updatedCar = await prisma.car.update({
       where: { id: carId },
       data: {
         brand: brand || car.brand,
@@ -523,7 +526,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
       return;
     }
 
-    const placaRepetida = await db.car.findFirst({
+    const placaRepetida = await prisma.car.findFirst({
       where: {
         licensePlate
       },
@@ -561,7 +564,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
       return;
     }
 
-    const newCar = await db.car.create({
+    const newCar = await prisma.car.create({
       data: {
         userId: req.user!.id,
         location,
@@ -597,7 +600,7 @@ router.patch('/:id/availability', authenticateToken, isHost, async (req: AuthReq
     const carId = parseInt(req.params.id);
     const { unavailableDates } = req.body;
 
-    const car = await db.car.findUnique({ where: { id: carId } });
+    const car = await prisma.car.findUnique({ where: { id: carId } });
 
     if (!car) {
       res.status(404).json({ error: 'Auto no encontrado' });
@@ -614,7 +617,7 @@ router.patch('/:id/availability', authenticateToken, isHost, async (req: AuthReq
       return;
     }
 
-    const updatedCar = await db.car.update({
+    const updatedCar = await prisma.car.update({
       where: { id: carId },
       data: {
         unavailableDates,

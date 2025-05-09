@@ -91,3 +91,34 @@ Repositorio para el desarrollo Back-end de la aplicación web RediBo. Este proye
   ```bash
   pnpm prisma:studio
   ```
+
+
+Para este desplegado se tiene que borrar/comentar esta linea del schema.primsa
+  output   = "../src/generated/client"
+para que el prisma client lo bote dentor de node_modules directamente
+
+Al momento de importar desde cualquier archivo ya sea auth.ts , cars.ts , etc en lugar de 
+importar asi
+   import { PrismaClient, Prisma } from '../generated/client';
+importar de esta manera
+   import {PrismaClient, Prisma} from '@prisma/client';
+
+
+**** Para hacer un pull ****
+primero:
+   git fetch upstream nombre-de-la-rama
+luego:
+   git merge upstream/nomre-de-la-rama
+
+
+**** Al momento de cambiar los imports volver a generar la base de datos ****
+si es que se han hecho cambios al esquema de la base de datos usar:
+   pnpm prisma generate dev --name nombre-descriptivo
+
+si solamente se cambiaron los imports pero la base de datos se matiene igual usar:
+   pnpm prisma generate
+
+Aplicar:
+   pnpm prisma migrate reset --force
+si sale algun error en el caso de que se haya hecho cambios en la base de datos y no quiere
+migrar con pnpm prisma generate dev --name nombre-descriptivo

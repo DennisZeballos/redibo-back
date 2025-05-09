@@ -47,7 +47,11 @@ export declare type AllModelsToStringIndex<TypeMap extends TypeMapDef, Args exte
 } : {};
 
 declare class AnyNull extends NullTypesEnumValue {
+<<<<<<< HEAD
     private readonly _brand_AnyNull;
+=======
+    #private;
+>>>>>>> 562c4d0e9d8c0d633c3e02e4b5831380a859a384
 }
 
 export declare type ApplyOmit<T, OmitConfig> = Compute<{
@@ -384,7 +388,11 @@ declare type Datasources = {
 };
 
 declare class DbNull extends NullTypesEnumValue {
+<<<<<<< HEAD
     private readonly _brand_DbNull;
+=======
+    #private;
+>>>>>>> 562c4d0e9d8c0d633c3e02e4b5831380a859a384
 }
 
 export declare const Debug: typeof debugCreate & {
@@ -1149,6 +1157,52 @@ declare type Error_2 = {
     kind: 'InvalidIsolationLevel';
     level: string;
 } | {
+<<<<<<< HEAD
+=======
+    kind: 'LengthMismatch';
+    column?: string;
+} | {
+    kind: 'UniqueConstraintViolation';
+    fields: string[];
+} | {
+    kind: 'NullConstraintViolation';
+    fields: string[];
+} | {
+    kind: 'ForeignKeyConstraintViolation';
+    constraint?: {
+        fields: string[];
+    } | {
+        index: string;
+    } | {
+        foreignKey: {};
+    };
+} | {
+    kind: 'DatabaseDoesNotExist';
+    db?: string;
+} | {
+    kind: 'DatabaseAlreadyExists';
+    db?: string;
+} | {
+    kind: 'DatabaseAccessDenied';
+    db?: string;
+} | {
+    kind: 'AuthenticationFailed';
+    user?: string;
+} | {
+    kind: 'TransactionWriteConflict';
+} | {
+    kind: 'TableDoesNotExist';
+    table?: string;
+} | {
+    kind: 'ColumnNotFound';
+    column?: string;
+} | {
+    kind: 'TooManyConnections';
+    cause: string;
+} | {
+    kind: 'SocketTimeout';
+} | {
+>>>>>>> 562c4d0e9d8c0d633c3e02e4b5831380a859a384
     kind: 'postgres';
     code: string;
     severity: string;
@@ -1978,7 +2032,11 @@ declare type JsonFieldSelection = {
 };
 
 declare class JsonNull extends NullTypesEnumValue {
+<<<<<<< HEAD
     private readonly _brand_JsonNull;
+=======
+    #private;
+>>>>>>> 562c4d0e9d8c0d633c3e02e4b5831380a859a384
 }
 
 /**
@@ -2645,8 +2703,13 @@ declare interface Queryable<Query, Result> extends AdapterInfo {
 }
 
 declare type QueryCompiler = {
+<<<<<<< HEAD
     compile(request: string): Promise<string>;
     compileBatch(batchRequest: string): Promise<BatchResponse>;
+=======
+    compile(request: string): string;
+    compileBatch(batchRequest: string): BatchResponse;
+>>>>>>> 562c4d0e9d8c0d633c3e02e4b5831380a859a384
 };
 
 declare interface QueryCompilerConstructor {
