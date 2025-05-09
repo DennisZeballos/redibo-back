@@ -16,6 +16,7 @@ dist
 # Others
 .env
 .env.local
+src/generated/
 
 coverage
 
