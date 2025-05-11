@@ -1,8 +1,5 @@
 declare class AnyNull extends NullTypesEnumValue {
-<<<<<<< HEAD
     #private;
-=======
->>>>>>> a146f4f1c358fb7c702b6e4b26f094bb99cdd3c2
 }
 
 declare type Args<T, F extends Operation> = T extends {
@@ -18,10 +15,7 @@ declare type Args<T, F extends Operation> = T extends {
 } ? T[symbol]['types']['operations'][F]['args'] : any;
 
 declare class DbNull extends NullTypesEnumValue {
-<<<<<<< HEAD
     #private;
-=======
->>>>>>> a146f4f1c358fb7c702b6e4b26f094bb99cdd3c2
 }
 
 export declare function Decimal(n: Decimal.Value): Decimal;
@@ -306,10 +300,7 @@ declare type GetRuntimeOutput = {
 };
 
 declare class JsonNull extends NullTypesEnumValue {
-<<<<<<< HEAD
     #private;
-=======
->>>>>>> a146f4f1c358fb7c702b6e4b26f094bb99cdd3c2
 }
 
 /**
