@@ -443,7 +443,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       pricePerDay,
       seats,
       transmission,
-      imageUrl,
+      imageUrls,
       isAvailable,
       extraEquipment,
       description,
@@ -464,7 +464,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         transmission: transmission || car.transmission,
         fuelType: fuelType || car.fuelType, // ✅ string
         kilometers: kilometers || car.kilometers, // ✅ mantener como string
-        photos: Array.isArray(imageUrl) ? imageUrl : imageUrl ? [imageUrl] : car.photos,
+        photos: Array.isArray(imageUrls) ? imageUrls : imageUrls ? [imageUrls] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
         isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable,
         description: description || car.description,
