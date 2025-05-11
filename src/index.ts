@@ -12,7 +12,23 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors())
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://pivotes-front-h4pvc7qy8-bryan-s-projects-9e27ee98.vercel.app'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true
+}));
 
 // Rutas de API
 app.use('/api/hosts', hostRoutes); 
@@ -20,12 +36,12 @@ app.use('/api/hosts', hostRoutes);
 // Middleware
 app.use(express.json());
 app.use(fileUpload());
-app.use((req: Request, res: Response, next: NextFunction) => {
+/*app.use((req: Request, res: Response, next: NextFunction) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   next();
-});
+});*/
 
 // Servir archivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, '../Uploads')));
@@ -47,6 +63,5 @@ app.listen(PORT, () => {
 });
 
 app.get('/', (req, res) => {
-  res.json('server running');
-  
+  res.json({message: 'server running'});
 })
