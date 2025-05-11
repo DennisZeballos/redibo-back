@@ -12,11 +12,22 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://pivotes-front-h4pvc7qy8-bryan-s-projects-9e27ee98.vercel.app'
+];
+
 app.use(cors({
-  origin: 'https://pivotes-front-h4pvc7qy8-bryan-s-projects-9e27ee98.vercel.app',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-  credentials: true // Si usas cookies o autenticación
+  credentials: true
 }));
 
 // Rutas de API
