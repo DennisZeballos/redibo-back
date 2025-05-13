@@ -145,7 +145,10 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     }
 
     if (search) {
-      const searchTerm = search as string;
+      const searchTerm = (search as string).toLowerCase();
+      const [firstWord, ...restWords] = searchTerm.split(" ");
+      const secondPart = restWords.join(" ");
+
       where.OR = [
         { brand: { contains: searchTerm, mode: 'insensitive' } },
         { model: { contains: searchTerm, mode: 'insensitive' } },
@@ -153,6 +156,12 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         { carType: { contains: searchTerm, mode: 'insensitive' } },
         { transmission: { contains: searchTerm, mode: 'insensitive' } },
         { fuelType: { contains: searchTerm, mode: 'insensitive' } },
+        {
+          AND: [
+            { brand: { contains: firstWord, mode: 'insensitive' } },
+            { model: { contains: secondPart, mode: 'insensitive' } },
+          ],
+        },
       ];
     }
 
