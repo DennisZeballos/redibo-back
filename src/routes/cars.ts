@@ -148,7 +148,10 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     }
 
     if (search) {
-      const searchTerm = search as string;
+      const searchTerm = (search as string).toLowerCase();
+      const [firstWord, ...restWords] = searchTerm.split(" ");
+      const secondPart = restWords.join(" ");
+
       where.OR = [
         { brand: { contains: searchTerm, mode: 'insensitive' } },
         { model: { contains: searchTerm, mode: 'insensitive' } },
@@ -156,6 +159,12 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         { carType: { contains: searchTerm, mode: 'insensitive' } },
         { transmission: { contains: searchTerm, mode: 'insensitive' } },
         { fuelType: { contains: searchTerm, mode: 'insensitive' } },
+        {
+          AND: [
+            { brand: { contains: firstWord, mode: 'insensitive' } },
+            { model: { contains: secondPart, mode: 'insensitive' } },
+          ],
+        },
       ];
     }
 
@@ -446,7 +455,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       pricePerDay,
       seats,
       transmission,
-      imageUrl,
+      imageUrls,
       isAvailable,
       extraEquipment,
       description,
@@ -467,7 +476,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         transmission: transmission || car.transmission,
         fuelType: fuelType || car.fuelType, // ✅ string
         kilometers: kilometers || car.kilometers, // ✅ mantener como string
-        photos: Array.isArray(imageUrl) ? imageUrl : imageUrl ? [imageUrl] : car.photos,
+        photos: Array.isArray(imageUrls) ? imageUrls : imageUrls ? [imageUrls] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
         isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable,
         description: description || car.description,
