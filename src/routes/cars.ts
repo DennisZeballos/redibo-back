@@ -389,7 +389,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
       transmission: car.transmission,
       color: car.color,
       imageUrl: car.photos,
-      isAvailable: car.isAvailable, // Usar el valor real de la base de datos
+      isAvailable: car.isAvailable, 
       unavailableDates: car.unavailableDates,
       extraEquipment: car.extraEquipment,
       rentalCount: car.rentalCount,
@@ -418,6 +418,22 @@ router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: e
     if (car.userId !== req.user!.id) {
       res.status(403).json({ error: 'No autorizado para eliminar este auto' });
       return;
+    }
+
+    // Verificar si el auto tiene reservas activas
+      const activeRentals = await db.rental.findMany({
+      where: {
+       carId: carId,
+       startDate: { lte: new Date() },
+       endDate: { gte: new Date() }
+      }
+    });
+
+    if (activeRentals.length > 0) {
+      res.status(400).json({
+        error: 'No se puede eliminar un auto con reservas activas.'
+     });
+       return;
     }
 
     await db.car.delete({ where: { id: carId } });
@@ -457,7 +473,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       extraEquipment,
       description,
       fuelType,
-      kilometers, // 👈 string
+      kilometers, 
     } = req.body;
     
     const updatedCar = await db.car.update({
@@ -471,8 +487,8 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
         seats: seats ? parseInt(seats) : car.seats,
         transmission: transmission || car.transmission,
-        fuelType: fuelType || car.fuelType, // ✅ string
-        kilometers: kilometers || car.kilometers, // ✅ mantener como string
+        fuelType: fuelType || car.fuelType, 
+        kilometers: kilometers || car.kilometers,
         photos: Array.isArray(imageUrls) ? imageUrls : imageUrls ? [imageUrls] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
         isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable,
@@ -495,7 +511,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         transmission: updatedCar.transmission,
         color: updatedCar.color,
         imageUrl: car.photos || ['/placeholder-car.jpg'],
-        isAvailable: updatedCar.isAvailable, // Usar el valor real de la base de datos
+        isAvailable: updatedCar.isAvailable,
         unavailableDates: updatedCar.unavailableDates,
         extraEquipment: updatedCar.extraEquipment,
         description: updatedCar.description,
