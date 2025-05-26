@@ -24,6 +24,7 @@ interface CarRequestBody {
   description?: string;
   photoUrls?: string[];
   extraEquipment?: string[];
+  isAvailable?: boolean;
 }
 
 interface UploadedPhoto extends UploadedFile {
@@ -108,7 +109,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     // Kilometrajes
     if (req.query.kilometrajes) {
       const km = req.query.kilometrajes as string;
-    
+
       if (km === '0 – 10.000 km') {
         where.kilometers = { lte: '10000' };
       } else if (km === '10.000 – 50.000 km') {
@@ -116,7 +117,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
       } else if (km === 'más de 50.000 km') {
         where.kilometers = { gte: '50000' };
       }
-    }   
+    }
 
     if (minPrice || maxPrice) {
       where.pricePerDay = {};
@@ -233,7 +234,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         transmission: car.transmission,
         color: car.color,
         isAvailable: car.isAvailable, // Usar el valor real de la base de datos
-        
+
       })),
       totalCars,
       currentPage: pageNumber,
@@ -369,7 +370,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
         licensePlate: true,
         fuelType: true,
         description: true,
-        isAvailable: true, 
+        isAvailable: true,
       },
     });
 
@@ -389,7 +390,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
       transmission: car.transmission,
       color: car.color,
       imageUrl: car.photos,
-      isAvailable: car.isAvailable, 
+      isAvailable: car.isAvailable,
       unavailableDates: car.unavailableDates,
       extraEquipment: car.extraEquipment,
       rentalCount: car.rentalCount,
@@ -421,19 +422,19 @@ router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: e
     }
 
     // Verificar si el auto tiene reservas activas
-      const activeRentals = await db.rental.findMany({
+    const activeRentals = await db.rental.findMany({
       where: {
-       carId: carId,
-       startDate: { lte: new Date() },
-       endDate: { gte: new Date() }
+        carId: carId,
+        startDate: { lte: new Date() },
+        endDate: { gte: new Date() }
       }
     });
 
     if (activeRentals.length > 0) {
       res.status(400).json({
         error: 'No se puede eliminar un auto con reservas activas.'
-     });
-       return;
+      });
+      return;
     }
 
     await db.car.delete({ where: { id: carId } });
@@ -473,9 +474,9 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       extraEquipment,
       description,
       fuelType,
-      kilometers, 
+      kilometers,
     } = req.body;
-    
+
     const updatedCar = await db.car.update({
       where: { id: carId },
       data: {
@@ -487,7 +488,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
         seats: seats ? parseInt(seats) : car.seats,
         transmission: transmission || car.transmission,
-        fuelType: fuelType || car.fuelType, 
+        fuelType: fuelType || car.fuelType,
         kilometers: kilometers || car.kilometers,
         photos: Array.isArray(imageUrls) ? imageUrls : imageUrls ? [imageUrls] : car.photos,
         extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
@@ -495,8 +496,8 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         description: description || car.description,
       },
     });
-    
-    
+
+
 
     res.status(200).json({
       success: true,
@@ -541,6 +542,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
       description,
       photoUrls,
       extraEquipment,
+      isAvailable,
     } = req.body as CarRequestBody;
 
     if (!location || !brand || !year || !pricePerDay || !kilometers || !licensePlate || !transmission || !fuelType || !seats) {
@@ -553,7 +555,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
         licensePlate
       },
     });
-    
+
     if (placaRepetida) {
       res.status(409).json({ message: 'La placa de este auto ya está registrada' });
       return;
@@ -604,7 +606,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
         description: description || null,
         photos: photoPaths,
         extraEquipment: extraEquipment || [],
-        isAvailable: true, // Valor por defecto
+        isAvailable: typeof isAvailable === 'boolean' ? isAvailable : true,
       },
     });
 
@@ -668,5 +670,68 @@ router.patch('/:id/availability', authenticateToken, isHost, async (req: AuthReq
     next(err);
   }
 });
+
+router.get('/:id/availability', async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
+  try {
+    const carId = parseInt(req.params.id);
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      res.status(400).json({ error: 'Debe proporcionar startDate y endDate' });
+      return;
+    }
+
+    const start = new Date(startDate as string);
+    const end = new Date(endDate as string);
+
+    const conflictingRentals = await db.rental.findMany({
+      where: {
+        carId,
+        AND: [
+          { startDate: { lte: end } },
+          { endDate: { gte: start } },
+        ],
+      },
+    });
+
+    const isAvailable = conflictingRentals.length === 0;
+
+    res.status(200).json({
+      carId,
+      isAvailable,
+      conflictingRentals,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+router.get('/:id/availability', async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
+  try {
+    const carId = parseInt(req.params.id);
+    const now = new Date();
+
+    const activeRental = await db.rental.findFirst({
+      where: {
+        carId,
+        startDate: { lte: now },
+        endDate: { gte: now },
+      },
+    });
+
+    const isAvailable = !activeRental;
+
+    res.status(200).json({
+      carId,
+      isAvailable,
+      activeRental,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 
 export default router;
