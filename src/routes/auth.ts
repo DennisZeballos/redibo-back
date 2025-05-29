@@ -13,7 +13,7 @@ interface RegisterRequestBody {
   role: string;
   name: string;
   location?: string;
-  
+
 }
 
 interface LoginRequestBody {
@@ -37,26 +37,29 @@ router.post('/register', async (req: express.Request, res: Response, next: NextF
       return;
     }
 
-    const existingUser = await db.user.findUnique({ where: { email } });
+    const existingUser = await db.usuario.findUnique({ where: { email } });
     if (existingUser) {
       res.status(400).json({ error: 'El email ya está registrado' });
       return;
     }
 
     const hashedPassword = await hash(password, 10);
-    const user = await db.user.create({
+    const usuario = await db.usuario.create({
       data: {
         email,
-        password: hashedPassword,
-        location: role === 'host' ? location || '' : undefined,
-        role,
-        name,
+        contraseña: hashedPassword,
+        nombreCompleto: name,
+        direccion: role === 'host' ? location || '' : undefined,
+        host: role === 'host',
+        driverBool: false,
+        registradoCon: 'email', // <-- Aquí va en minúsculas
       },
     });
 
-    const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '1h' });
 
-    res.status(201).json({ success: true, token, role: user.role });
+    const token = jwt.sign({ id: usuario.idUsuario, host: usuario.host }, secret, { expiresIn: '1h' });
+
+    res.status(201).json({ success: true, token, host: usuario.host });
   } catch (err) {
     next(err);
   }
@@ -72,24 +75,25 @@ router.post('/login', async (req: express.Request, res: Response, next: NextFunc
       return;
     }
 
-    const user = await db.user.findUnique({ where: { email } });
-    if (!user) {
+    const usuario = await db.usuario.findUnique({ where: { email } });
+    if (!usuario || !usuario.contraseña) {
       res.status(401).json({ error: 'Credenciales inválidas' });
       return;
     }
 
-    const isPasswordValid = await compare(password, user.password);
+    const isPasswordValid = await compare(password, usuario.contraseña);
     if (!isPasswordValid) {
       res.status(401).json({ error: 'Credenciales inválidas' });
       return;
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '1h' });
+    const token = jwt.sign({ id: usuario.idUsuario, host: usuario.host }, secret, { expiresIn: '1h' });
 
-    res.status(200).json({ success: true, token, role: user.role });
+    res.status(200).json({ success: true, token, host: usuario.host });
   } catch (err) {
     next(err);
   }
 });
+
 
 export default router;
