@@ -209,6 +209,7 @@ exports.Prisma.NotificacionScalarFieldEnum = {
 
 exports.Prisma.UbicacionScalarFieldEnum = {
   idUbicacion: 'idUbicacion',
+  departamento: 'departamento',
   nombre: 'nombre',
   descripcion: 'descripcion',
   latitud: 'latitud',

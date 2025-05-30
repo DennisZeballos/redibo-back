@@ -13,6 +13,7 @@ async function main() {
     update: {},
     create: {
       nombre: 'Ubicacion Central',
+      departamento: 'Cochabamba',
       descripcion: 'Ubicacion principal de autos',
       latitud: -12.0464,
       longitud: -77.0428,
@@ -25,6 +26,7 @@ async function main() {
     update: {},
     create: {
       nombre: 'Ubicacion Norte',
+      departamento: 'Santa Cruz',
       descripcion: 'Ubicacion secundaria de autos',
       latitud: -11.995,
       longitud: -77.062,

@@ -10128,6 +10128,7 @@ export namespace Prisma {
 
   export type UbicacionMinAggregateOutputType = {
     idUbicacion: number | null
+    departamento: string | null
     nombre: string | null
     descripcion: string | null
     latitud: number | null
@@ -10137,6 +10138,7 @@ export namespace Prisma {
 
   export type UbicacionMaxAggregateOutputType = {
     idUbicacion: number | null
+    departamento: string | null
     nombre: string | null
     descripcion: string | null
     latitud: number | null
@@ -10146,6 +10148,7 @@ export namespace Prisma {
 
   export type UbicacionCountAggregateOutputType = {
     idUbicacion: number
+    departamento: number
     nombre: number
     descripcion: number
     latitud: number
@@ -10169,6 +10172,7 @@ export namespace Prisma {
 
   export type UbicacionMinAggregateInputType = {
     idUbicacion?: true
+    departamento?: true
     nombre?: true
     descripcion?: true
     latitud?: true
@@ -10178,6 +10182,7 @@ export namespace Prisma {
 
   export type UbicacionMaxAggregateInputType = {
     idUbicacion?: true
+    departamento?: true
     nombre?: true
     descripcion?: true
     latitud?: true
@@ -10187,6 +10192,7 @@ export namespace Prisma {
 
   export type UbicacionCountAggregateInputType = {
     idUbicacion?: true
+    departamento?: true
     nombre?: true
     descripcion?: true
     latitud?: true
@@ -10283,6 +10289,7 @@ export namespace Prisma {
 
   export type UbicacionGroupByOutputType = {
     idUbicacion: number
+    departamento: string
     nombre: string
     descripcion: string | null
     latitud: number
@@ -10311,6 +10318,7 @@ export namespace Prisma {
 
   export type UbicacionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     idUbicacion?: boolean
+    departamento?: boolean
     nombre?: boolean
     descripcion?: boolean
     latitud?: boolean
@@ -10322,6 +10330,7 @@ export namespace Prisma {
 
   export type UbicacionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     idUbicacion?: boolean
+    departamento?: boolean
     nombre?: boolean
     descripcion?: boolean
     latitud?: boolean
@@ -10331,6 +10340,7 @@ export namespace Prisma {
 
   export type UbicacionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     idUbicacion?: boolean
+    departamento?: boolean
     nombre?: boolean
     descripcion?: boolean
     latitud?: boolean
@@ -10340,6 +10350,7 @@ export namespace Prisma {
 
   export type UbicacionSelectScalar = {
     idUbicacion?: boolean
+    departamento?: boolean
     nombre?: boolean
     descripcion?: boolean
     latitud?: boolean
@@ -10347,7 +10358,7 @@ export namespace Prisma {
     esActiva?: boolean
   }
 
-  export type UbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"idUbicacion" | "nombre" | "descripcion" | "latitud" | "longitud" | "esActiva", ExtArgs["result"]["ubicacion"]>
+  export type UbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"idUbicacion" | "departamento" | "nombre" | "descripcion" | "latitud" | "longitud" | "esActiva", ExtArgs["result"]["ubicacion"]>
   export type UbicacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     autos?: boolean | Ubicacion$autosArgs<ExtArgs>
     _count?: boolean | UbicacionCountOutputTypeDefaultArgs<ExtArgs>
@@ -10362,6 +10373,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       idUbicacion: number
+      departamento: string
       nombre: string
       descripcion: string | null
       latitud: number
@@ -10792,6 +10804,7 @@ export namespace Prisma {
    */
   interface UbicacionFieldRefs {
     readonly idUbicacion: FieldRef<"Ubicacion", 'Int'>
+    readonly departamento: FieldRef<"Ubicacion", 'String'>
     readonly nombre: FieldRef<"Ubicacion", 'String'>
     readonly descripcion: FieldRef<"Ubicacion", 'String'>
     readonly latitud: FieldRef<"Ubicacion", 'Float'>
@@ -22127,6 +22140,7 @@ export namespace Prisma {
 
   export const UbicacionScalarFieldEnum: {
     idUbicacion: 'idUbicacion',
+    departamento: 'departamento',
     nombre: 'nombre',
     descripcion: 'descripcion',
     latitud: 'latitud',
@@ -23157,6 +23171,7 @@ export namespace Prisma {
     OR?: UbicacionWhereInput[]
     NOT?: UbicacionWhereInput | UbicacionWhereInput[]
     idUbicacion?: IntFilter<"Ubicacion"> | number
+    departamento?: StringFilter<"Ubicacion"> | string
     nombre?: StringFilter<"Ubicacion"> | string
     descripcion?: StringNullableFilter<"Ubicacion"> | string | null
     latitud?: FloatFilter<"Ubicacion"> | number
@@ -23167,6 +23182,7 @@ export namespace Prisma {
 
   export type UbicacionOrderByWithRelationInput = {
     idUbicacion?: SortOrder
+    departamento?: SortOrder
     nombre?: SortOrder
     descripcion?: SortOrderInput | SortOrder
     latitud?: SortOrder
@@ -23181,6 +23197,7 @@ export namespace Prisma {
     AND?: UbicacionWhereInput | UbicacionWhereInput[]
     OR?: UbicacionWhereInput[]
     NOT?: UbicacionWhereInput | UbicacionWhereInput[]
+    departamento?: StringFilter<"Ubicacion"> | string
     descripcion?: StringNullableFilter<"Ubicacion"> | string | null
     latitud?: FloatFilter<"Ubicacion"> | number
     longitud?: FloatFilter<"Ubicacion"> | number
@@ -23190,6 +23207,7 @@ export namespace Prisma {
 
   export type UbicacionOrderByWithAggregationInput = {
     idUbicacion?: SortOrder
+    departamento?: SortOrder
     nombre?: SortOrder
     descripcion?: SortOrderInput | SortOrder
     latitud?: SortOrder
@@ -23207,6 +23225,7 @@ export namespace Prisma {
     OR?: UbicacionScalarWhereWithAggregatesInput[]
     NOT?: UbicacionScalarWhereWithAggregatesInput | UbicacionScalarWhereWithAggregatesInput[]
     idUbicacion?: IntWithAggregatesFilter<"Ubicacion"> | number
+    departamento?: StringWithAggregatesFilter<"Ubicacion"> | string
     nombre?: StringWithAggregatesFilter<"Ubicacion"> | string
     descripcion?: StringNullableWithAggregatesFilter<"Ubicacion"> | string | null
     latitud?: FloatWithAggregatesFilter<"Ubicacion"> | number
@@ -24597,6 +24616,7 @@ export namespace Prisma {
   }
 
   export type UbicacionCreateInput = {
+    departamento: string
     nombre: string
     descripcion?: string | null
     latitud: number
@@ -24607,6 +24627,7 @@ export namespace Prisma {
 
   export type UbicacionUncheckedCreateInput = {
     idUbicacion?: number
+    departamento: string
     nombre: string
     descripcion?: string | null
     latitud: number
@@ -24616,6 +24637,7 @@ export namespace Prisma {
   }
 
   export type UbicacionUpdateInput = {
+    departamento?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: FloatFieldUpdateOperationsInput | number
@@ -24626,6 +24648,7 @@ export namespace Prisma {
 
   export type UbicacionUncheckedUpdateInput = {
     idUbicacion?: IntFieldUpdateOperationsInput | number
+    departamento?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: FloatFieldUpdateOperationsInput | number
@@ -24636,6 +24659,7 @@ export namespace Prisma {
 
   export type UbicacionCreateManyInput = {
     idUbicacion?: number
+    departamento: string
     nombre: string
     descripcion?: string | null
     latitud: number
@@ -24644,6 +24668,7 @@ export namespace Prisma {
   }
 
   export type UbicacionUpdateManyMutationInput = {
+    departamento?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: FloatFieldUpdateOperationsInput | number
@@ -24653,6 +24678,7 @@ export namespace Prisma {
 
   export type UbicacionUncheckedUpdateManyInput = {
     idUbicacion?: IntFieldUpdateOperationsInput | number
+    departamento?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: FloatFieldUpdateOperationsInput | number
@@ -26154,6 +26180,7 @@ export namespace Prisma {
 
   export type UbicacionCountOrderByAggregateInput = {
     idUbicacion?: SortOrder
+    departamento?: SortOrder
     nombre?: SortOrder
     descripcion?: SortOrder
     latitud?: SortOrder
@@ -26169,6 +26196,7 @@ export namespace Prisma {
 
   export type UbicacionMaxOrderByAggregateInput = {
     idUbicacion?: SortOrder
+    departamento?: SortOrder
     nombre?: SortOrder
     descripcion?: SortOrder
     latitud?: SortOrder
@@ -26178,6 +26206,7 @@ export namespace Prisma {
 
   export type UbicacionMinOrderByAggregateInput = {
     idUbicacion?: SortOrder
+    departamento?: SortOrder
     nombre?: SortOrder
     descripcion?: SortOrder
     latitud?: SortOrder
@@ -30536,6 +30565,7 @@ export namespace Prisma {
   }
 
   export type UbicacionCreateWithoutAutosInput = {
+    departamento: string
     nombre: string
     descripcion?: string | null
     latitud: number
@@ -30545,6 +30575,7 @@ export namespace Prisma {
 
   export type UbicacionUncheckedCreateWithoutAutosInput = {
     idUbicacion?: number
+    departamento: string
     nombre: string
     descripcion?: string | null
     latitud: number
@@ -30798,6 +30829,7 @@ export namespace Prisma {
   }
 
   export type UbicacionUpdateWithoutAutosInput = {
+    departamento?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: FloatFieldUpdateOperationsInput | number
@@ -30807,6 +30839,7 @@ export namespace Prisma {
 
   export type UbicacionUncheckedUpdateWithoutAutosInput = {
     idUbicacion?: IntFieldUpdateOperationsInput | number
+    departamento?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: FloatFieldUpdateOperationsInput | number

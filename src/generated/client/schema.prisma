@@ -142,13 +142,14 @@ model Notificacion {
 }
 
 model Ubicacion {
-  idUbicacion Int     @id @default(autoincrement())
-  nombre      String  @unique
-  descripcion String?
-  latitud     Float
-  longitud    Float
-  esActiva    Boolean @default(true)
-  autos       Auto[]
+  idUbicacion  Int     @id @default(autoincrement())
+  departamento String
+  nombre       String  @unique
+  descripcion  String?
+  latitud      Float
+  longitud     Float
+  esActiva     Boolean @default(true)
+  autos        Auto[]
 
   @@map("ubicaciones")
 }
