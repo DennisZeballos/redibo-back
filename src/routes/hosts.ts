@@ -9,23 +9,30 @@ router.get('/', async (req, res) => {
   const search = (req.query.search as string)?.toLowerCase().replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '') || "";
 
   console.log("Valor de búsqueda recibido:", search);
-  
+
   try {
-    const hosts = await db.user.findMany({
+    const hosts = await db.usuario.findMany({
       where: {
-        role: 'host',
-    
-       // cars: {
-       //   some: {}, 
-       // },
+        host: true,
+        nombreCompleto: {
+          contains: search,
+          mode: 'insensitive',
+        },
+        autos: {
+          some: {}, // asegura que tenga al menos un auto
+        },
       },
       select: {
-        id: true,
-        name: true,
-        cars: {
+        idUsuario: true,
+        nombreCompleto: true,
+        autos: {
           take: 1,
           select: {
-            location: true,
+            ubicacion: {
+              select: {
+                departamento: true
+              },
+            },
           },
         },
       },
@@ -33,9 +40,9 @@ router.get('/', async (req, res) => {
     });
 
     const resultados = hosts.map((host) => ({
-      id: host.id,
-      name: host.name,
-      location: host.cars[0]?.location || '',
+      id: host.idUsuario,
+      name: host.nombreCompleto,
+      location: host.autos[0]?.ubicacion.departamento || null,
     }));
 
     res.status(200).json(resultados);

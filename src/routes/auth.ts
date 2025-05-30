@@ -57,7 +57,15 @@ router.post('/register', async (req: express.Request, res: Response, next: NextF
     });
 
 
-    const token = jwt.sign({ id: usuario.idUsuario, host: usuario.host }, secret, { expiresIn: '1h' });
+    const token = jwt.sign(
+      {
+        id: usuario.idUsuario,
+        role: usuario.host ? 'host' : 'guest'
+      },
+      secret,
+      { expiresIn: '1h' }
+    );
+
 
     res.status(201).json({ success: true, token, host: usuario.host });
   } catch (err) {
@@ -87,9 +95,16 @@ router.post('/login', async (req: express.Request, res: Response, next: NextFunc
       return;
     }
 
-    const token = jwt.sign({ id: usuario.idUsuario, host: usuario.host }, secret, { expiresIn: '1h' });
+    const token = jwt.sign(
+      {
+        id: usuario.idUsuario,
+        role: usuario.host ? 'host' : 'guest'
+      },
+      secret,
+      { expiresIn: '1h' }
+    );
 
-    res.status(200).json({ success: true, token, host: usuario.host });
+    res.status(200).json({ success: true, token, host: usuario.host, role: usuario.host? 'host' : 'guest' });
   } catch (err) {
     next(err);
   }
