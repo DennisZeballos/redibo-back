@@ -347,6 +347,7 @@ enum Combustible {
   DIESEL
   ELECTRICO
   HIBRIDO
+  GAS
 }
 
 enum TipoMantenimiento {

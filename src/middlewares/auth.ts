@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { FileArray } from 'express-fileupload';
 
 export interface AuthRequest extends Request {
-  user?: { id: number; host: boolean };
+  user?: { id: number; role: string };
   files?: FileArray | null;
 }
 
@@ -17,7 +17,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: number; host: boolean };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: number; role: string };
     req.user = decoded;
     next();
   } catch (error) {
@@ -27,7 +27,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 };
 
 export const isHost = (req: AuthRequest, res: Response, next: NextFunction): void => {
-  if (!req.user || !req.user.host) {
+  if (!req.user || req.user.role !== 'host') {
     res.status(403).json({ error: 'Acceso denegado: se requiere ser host' });
     return;
   }

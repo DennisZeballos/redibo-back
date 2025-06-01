@@ -149,7 +149,8 @@ export const Combustible: {
   GASOLINA: 'GASOLINA',
   DIESEL: 'DIESEL',
   ELECTRICO: 'ELECTRICO',
-  HIBRIDO: 'HIBRIDO'
+  HIBRIDO: 'HIBRIDO',
+  GAS: 'GAS'
 };
 
 export type Combustible = (typeof Combustible)[keyof typeof Combustible]

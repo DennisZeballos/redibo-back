@@ -390,7 +390,8 @@ exports.Combustible = exports.$Enums.Combustible = {
   GASOLINA: 'GASOLINA',
   DIESEL: 'DIESEL',
   ELECTRICO: 'ELECTRICO',
-  HIBRIDO: 'HIBRIDO'
+  HIBRIDO: 'HIBRIDO',
+  GAS: 'GAS'
 };
 
 exports.MotivoNoDisponibilidad = exports.$Enums.MotivoNoDisponibilidad = {

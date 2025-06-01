@@ -585,37 +585,54 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
 router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const {
-      idUbicacion,
-      marca,
-      modelo,
-      año,
-      tipo,
+      location,         // nombre de la ubicación, ej "Cochabamba"
+      brand,            // marca
+      model,            // modelo
+      year,             // año
+      carType,          // tipo
       color,
-      precioRentaDiario,
-      kilometraje,
-      placa,
-      transmision,
-      combustible,
-      asientos,
-      descripcion,
+      pricePerDay,      // precioRentaDiario
+      kilometers,       // kilometraje
+      licensePlate,     // placa
+      transmission,     // transmision
+      fuelType,         // combustible
+      seats,            // asientos
+      description,
       montoGarantia,
       soat,
       photoUrls,
       capacidadMaletero,
-      // ...otros campos
     } = req.body;
 
     // Validar campos obligatorios mínimos
-    if (!idUbicacion || !marca || !año || !precioRentaDiario || !kilometraje || !placa || !transmision || !combustible || !asientos) {
+    if (
+      !location ||
+      !brand ||
+      !year ||
+      !pricePerDay ||
+      !kilometers ||
+      !licensePlate ||
+      !transmission ||
+      !fuelType ||
+      !seats
+    ) {
       res.status(400).json({ error: 'Faltan campos obligatorios' });
+      return;
+    }
+
+    // Buscar idUbicacion según el nombre recibido (location)
+    const ubicacionEncontrada = await db.ubicacion.findFirst({
+      where: { departamento: location, esActiva: true },
+    });
+
+    if (!ubicacionEncontrada) {
+      res.status(400).json({ error: `La ubicación '${location}' no existe o no está activa.` });
       return;
     }
 
     // Validar placa única
     const placaRepetida = await db.auto.findFirst({
-      where: {
-        placa,
-      },
+      where: { placa: licensePlate },
     });
 
     if (placaRepetida) {
@@ -623,7 +640,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
       return;
     }
 
-    // Validar fotos URLs o subir fotos (asumiendo manejo similar)
+    // Validar fotos URLs o subir fotos
     let imagenesData: { direccionImagen: string }[] = [];
 
     if (photoUrls && Array.isArray(photoUrls)) {
@@ -631,7 +648,7 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
         res.status(400).json({ error: 'Debes proporcionar entre 3 y 5 URLs de fotos' });
         return;
       }
-      imagenesData = photoUrls.map(url => ({ direccionImagen: url }));
+      imagenesData = photoUrls.map((url: string) => ({ direccionImagen: url }));
     } else if (req.files && req.files.photos) {
       const photoFiles = req.files.photos;
       const photos: UploadedPhoto[] = Array.isArray(photoFiles) ? photoFiles : [photoFiles as UploadedPhoto];
@@ -652,32 +669,68 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
       return;
     }
 
+    // para la transmision
+
+    let transmisionEnum: Transmision;
+
+    if (typeof transmission === 'string') {
+      const transUpper = transmission.toUpperCase();
+      if (transUpper === Transmision.AUTOMATICO || transUpper === Transmision.MANUAL) {
+        transmisionEnum = transUpper as Transmision;
+      } else {
+        res.status(400).json({ error: 'Transmisión inválida. Debe ser AUTOMATICO o MANUAL.' });
+        return;
+      }
+    } else {
+      res.status(400).json({ error: 'Transmisión inválida.' });
+      return;
+    }
+
+    // para combustible
+    let combustibleEnum: Combustible;
+    if (typeof fuelType === 'string') {
+      const fuelUpper = fuelType.toUpperCase();
+      if (
+        fuelUpper === Combustible.GASOLINA ||
+        fuelUpper === Combustible.DIESEL ||
+        fuelUpper === Combustible.ELECTRICO ||
+        fuelUpper === Combustible.HIBRIDO
+      ) {
+        combustibleEnum = fuelUpper as Combustible;
+      } else {
+        res.status(400).json({ error: 'Combustible inválido. Debe ser GASOLINA, DIESEL, ELECTRICO o HIBRIDO.' });
+        return;
+      }
+    } else {
+      res.status(400).json({ error: 'Combustible inválido.' });
+      return;
+    }
+
+    // Crear el auto con los campos mapeados y parseados
     const newAuto = await db.auto.create({
       data: {
         idPropietario: req.user!.id,
-        idUbicacion,
-        marca,
-        modelo: modelo || undefined,
-        año: parseInt(año),
-        tipo: tipo || null,
+        idUbicacion: ubicacionEncontrada.idUbicacion,
+        marca: brand,
+        modelo: model || undefined,
+        año: parseInt(year),
+        tipo: carType || null,
         color: color || undefined,
-        precioRentaDiario: parseFloat(precioRentaDiario),
-        kilometraje,
-        placa,
-        transmision,
-        combustible,
-        asientos: parseInt(asientos),
-        descripcion: descripcion || null,
-        montoGarantia: montoGarantia ? parseFloat(montoGarantia) : 0, // o valor por defecto
+        precioRentaDiario: parseFloat(pricePerDay),
+        kilometraje: parseInt(kilometers),
+        placa: licensePlate,
+        transmision: transmisionEnum,
+        combustible: combustibleEnum,
+        asientos: parseInt(seats),
+        descripcion: description || null,
+        montoGarantia: montoGarantia ? parseFloat(montoGarantia) : 0,
         soat: soat || '',
         capacidadMaletero: capacidadMaletero ? parseInt(capacidadMaletero) : 0,
         imagenes: {
           create: imagenesData,
         },
-      },  
-      include: {
-        imagenes: true,
       },
+      include: { imagenes: true },
     });
 
     res.status(201).json({ success: true, auto: newAuto });
