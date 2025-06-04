@@ -441,7 +441,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\hp\\Desktop\\RediBo_Back\\src\\generated\\client",
+      "value": "C:\\Users\\hp\\Desktop\\RediBo_Back_Deployed\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -455,7 +455,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\hp\\Desktop\\RediBo_Back\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\hp\\Desktop\\RediBo_Back_Deployed\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

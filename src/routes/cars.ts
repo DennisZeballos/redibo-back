@@ -6,7 +6,7 @@ import * as path from 'path';
 import { AuthRequest, authenticateToken, isHost } from '../middlewares/auth';
 
 const router = express.Router();
-//const db = new PrismaClient();
+const db = new PrismaClient();
 
 interface AutoRequestBody { // corregir en el otro luagar donde se usa esto
   idPropietario: number;        // idUsuario del propietario

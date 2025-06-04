@@ -1,7 +1,6 @@
 import express, { Response, NextFunction } from 'express';
 /*import { PrismaClient } from '@prisma/client';*/
-// import { PrismaClient, Prisma } from '../generated/client';
-import {PrismaClient, Prisma} from '@prisma/client';
+import { PrismaClient, Prisma } from '../generated/client';
 import { compare, hash } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -26,9 +25,9 @@ const secret = process.env.JWT_SECRET || 'your_jwt_secret';
 
 router.post('/register', async (req: express.Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { email, password, role } = req.body as RegisterRequestBody;
+    const { email, password, role, name, location } = req.body as RegisterRequestBody;
 
-    if (!email || !password || !role) {
+    if (!email || !password || !role || !name) {
       res.status(400).json({ error: 'Faltan campos obligatorios' });
       return;
     }
@@ -74,6 +73,7 @@ router.post('/register', async (req: express.Request, res: Response, next: NextF
   }
 });
 
+// POST /login
 router.post('/login', async (req: express.Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, password } = req.body as LoginRequestBody;
@@ -82,7 +82,7 @@ router.post('/login', async (req: express.Request, res: Response, next: NextFunc
       res.status(400).json({ error: 'Faltan campos obligatorios' });
       return;
     }
-
+    
     const usuario = await db.usuario.findUnique({ where: { email } });
     if (!usuario || !usuario.contraseña) {
       res.status(401).json({ error: 'Credenciales inválidas' });

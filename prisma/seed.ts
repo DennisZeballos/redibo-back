@@ -39,7 +39,7 @@ async function main() {
     where: { email: 'host1@gmail.com' },
     update: {},
     create: {
-      nombreCompleto: 'Host Uno',
+      nombreCompleto: 'Eduardo Paredes Rosales',
       email: 'host1@gmail.com',
       contraseña: hashedPassword,
       registradoCon: RegistradoCon.email,
@@ -53,7 +53,7 @@ async function main() {
     where: { email: 'host2@gmail.com' },
     update: {},
     create: {
-      nombreCompleto: 'Host Dos',
+      nombreCompleto: 'Juan Garcia Palacios',
       email: 'host2@gmail.com',
       contraseña: hashedPassword,
       registradoCon: RegistradoCon.email,
