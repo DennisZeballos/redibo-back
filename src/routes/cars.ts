@@ -1,8 +1,5 @@
 import * as express from 'express';
-//import { PrismaClient, Prisma } from '../generated/client';
-import {PrismaClient, Prisma} from '@prisma/client';
-import prisma from '../prisma';
-
+import { PrismaClient, Prisma, Transmision, Combustible } from '../generated/client';
 import fileUpload from 'express-fileupload';
 import { UploadedFile } from 'express-fileupload';
 import * as path from 'path';
@@ -11,23 +8,49 @@ import { AuthRequest, authenticateToken, isHost } from '../middlewares/auth';
 const router = express.Router();
 //const db = new PrismaClient();
 
-interface CarRequestBody {
-  location: string;
-  brand: string;
-  model?: string;
-  year: string;
-  carType?: string;
-  color?: string;
-  pricePerDay: string;
-  kilometers: string;
-  licensePlate: string;
-  transmission: string;
-  fuelType: string;
-  seats: string;
-  description?: string;
-  photoUrls?: string[];
-  extraEquipment?: string[];
+interface AutoRequestBody { // corregir en el otro luagar donde se usa esto
+  idPropietario: number;        // idUsuario del propietario
+  idUbicacion: number;          // idUbicacion de la ubicación (relación)
+
+  marca: string;
+  modelo: string;
+  descripcion?: string;
+
+  precioRentaDiario: string;    // usar string para recibir y luego parsear a Decimal
+  montoGarantia: string;        // garantía
+
+  kilometraje: number;
+
+  tipo: string;                 // tipo de auto (SUV, sedan, etc)
+  año: number;
+  placa: string;
+
+  soat: string;                 // número o referencia de SOAT
+  color: string;
+
+  estado?: 'ACTIVO' | 'INACTIVO' | 'OTRO'; // o el enum que uses en TS
+
+  fechaAdquisicion?: string;    // fecha en formato ISO o Date (según tu manejo)
+
+  asientos?: number;
+  capacidadMaletero?: number;
+
+  transmision: 'AUTOMATICO' | 'MANUAL' | string;  // o el enum correspondiente
+  combustible: 'GASOLINA' | 'DIESEL' | 'ELECTRICO' | 'HIBRIDO' | string; // según enum
+
+  diasTotalRenta?: number;
+  vecesAlquilado?: number;
+
+  // Otros campos relacionales que usualmente no se envían en request body:
+  // comentarios?: Comentario[];
+  // calificacionPromedio?: number;
+  // totalComentarios?: number;
+  // reservas?: Reserva[];
+  // disponibilidad?: Disponibilidad[];
+  // historialMantenimiento?: HistorialMantenimiento[];
+  // imagenes?: Imagen[];
 }
+
 
 interface UploadedPhoto extends UploadedFile {
   mv(path: string): Promise<void>;
@@ -44,6 +67,8 @@ router.use(
   })
 );
 
+
+// GET /api/cars - Listar autos con filtros, búsqueda y ordenamiento
 // GET /api/cars - Listar autos con filtros, búsqueda y ordenamiento
 router.get('/', async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
@@ -66,68 +91,72 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (pageNumber - 1) * limit;
 
-    const where: Prisma.CarWhereInput = {};
+    const where: Prisma.AutoWhereInput = {};
 
     if (location) {
-      where.location = { contains: location as string, mode: 'insensitive' };
-    }
-
-    if (hostId) {
-      where.userId = parseInt(hostId as string);
-    }
-
-    if (carType) {
-      where.carType = { equals: carType as string };
-    }
-
-    if (transmission) {
-      where.transmission = {
-        equals: transmission as string,
-        mode: 'insensitive',
+      where.ubicacion = {
+        departamento: {
+          contains: location as string,
+          mode: 'insensitive',
+        },
       };
     }
 
-    if (fuelType) {
-      where.fuelType = { equals: fuelType as string };
+
+    if (hostId) {
+      where.idPropietario = parseInt(hostId as string);
     }
 
-    // Capacidad (asientos)
+    if (carType) {
+      where.tipo = { equals: carType as string };
+    }
+
+    if (transmission) {
+      where.transmision = {
+        equals: transmission as Transmision
+      };
+
+    }
+
+    if (fuelType) {
+      where.combustible = { equals: fuelType as Combustible };
+    }
+
     if (req.query.capacidad) {
       const capacidad = req.query.capacidad as string;
       if (capacidad === '1 a 2 personas') {
-        where.seats = { lte: 2 };
+        where.asientos = { lte: 2 };
       } else if (capacidad === '3 a 5 personas') {
-        where.seats = { gte: 3, lte: 5 };
+        where.asientos = { gte: 3, lte: 5 };
       } else if (capacidad === '6 o más') {
-        where.seats = { gte: 6 };
+        where.asientos = { gte: 6 };
       }
     }
 
-    // Color
     if (req.query.color) {
       where.color = { equals: req.query.color as string, mode: 'insensitive' };
     }
 
-    // Kilometrajes
     if (req.query.kilometrajes) {
       const km = req.query.kilometrajes as string;
-    
+
       if (km === '0 – 10.000 km') {
-        where.kilometers = { lte: '10000' };
+        where.kilometraje = { lte: 10000 };
       } else if (km === '10.000 – 50.000 km') {
-        where.kilometers = { gte: '10000', lte: '50000' };
+        where.kilometraje = { gte: 10000, lte: 50000 };
       } else if (km === 'más de 50.000 km') {
-        where.kilometers = { gte: '50000' };
+        where.kilometraje = { gte: 50000 };
       }
-    }   
+
+    }
 
     if (minPrice || maxPrice) {
-      where.pricePerDay = {};
+      where.precioRentaDiario = {};
       if (minPrice) {
-        where.pricePerDay.gte = parseFloat(minPrice as string);
+        where.precioRentaDiario.gte = parseFloat(minPrice as string);
       }
       if (maxPrice) {
-        where.pricePerDay.lte = parseFloat(maxPrice as string);
+        where.precioRentaDiario.lte = parseFloat(maxPrice as string);
       }
     }
 
@@ -136,11 +165,11 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
       const end = new Date(endDate as string);
 
       where.NOT = {
-        rentals: {
+        reservas: {
           some: {
             AND: [
-              { startDate: { lte: end } },
-              { endDate: { gte: start } },
+              { fechaInicio: { lte: end } },
+              { fechaFin: { gte: start } },
             ],
           },
         },
@@ -153,92 +182,88 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
       const secondPart = restWords.join(" ");
 
       where.OR = [
-        { brand: { contains: searchTerm, mode: 'insensitive' } },
-        { model: { contains: searchTerm, mode: 'insensitive' } },
-        { description: { contains: searchTerm, mode: 'insensitive' } },
-        { carType: { contains: searchTerm, mode: 'insensitive' } },
-        { transmission: { contains: searchTerm, mode: 'insensitive' } },
-        { fuelType: { contains: searchTerm, mode: 'insensitive' } },
+        { marca: { contains: searchTerm, mode: 'insensitive' } },
+        { modelo: { contains: searchTerm, mode: 'insensitive' } },
+        { descripcion: { contains: searchTerm, mode: 'insensitive' } },
+        { tipo: { contains: searchTerm, mode: 'insensitive' } },
+        { transmision: { equals: searchTerm as Transmision } },
+        { combustible: { equals: searchTerm as Combustible } },
+
         {
           AND: [
-            { brand: { contains: firstWord, mode: 'insensitive' } },
-            { model: { contains: secondPart, mode: 'insensitive' } },
+            { marca: { contains: firstWord, mode: 'insensitive' } },
+            { modelo: { contains: secondPart, mode: 'insensitive' } },
           ],
         },
       ];
     }
 
-    let orderBy: Prisma.CarOrderByWithRelationInput = {};
+    let orderBy: Prisma.AutoOrderByWithRelationInput = {};
     switch (sortBy) {
       case 'priceAsc':
-        orderBy = { pricePerDay: 'asc' };
+        orderBy = { precioRentaDiario: 'asc' };
         break;
       case 'priceDesc':
-        orderBy = { pricePerDay: 'desc' };
+        orderBy = { precioRentaDiario: 'desc' };
         break;
       case 'relevance':
       default:
-        orderBy = { createdAt: 'desc' };
+        // Si no tienes creadoEn, usa id (o algún otro campo)
+        orderBy = { idAuto: 'desc' };
         break;
     }
 
-    const totalCars = await prisma.car.count({ where });
-    const cars = await prisma.car.findMany({
+
+    const totalAutos = await db.auto.count({ where });
+
+    const autos = await db.auto.findMany({
       where,
       skip,
       take: limit,
       orderBy,
       select: {
-        id: true,
-        brand: true,
-        model: true,
-        year: true,
-        carType: true,
-        pricePerDay: true,
-        rentalCount: true,
-        location: true,
-        photos: true,
-        user: {
+        idAuto: true,
+        marca: true,
+        modelo: true,
+        año: true,
+        tipo: true,
+        precioRentaDiario: true,
+        ubicacion: true,
+        imagenes: true,
+        propietario: {
           select: {
-            id: true,
+            idUsuario: true,
             email: true,
           },
         },
-        unavailableDates: true,
-        extraEquipment: true,
-        seats: true,
-        transmission: true,
+        disponibilidad: true,
+        asientos: true,
+        transmision: true,
         color: true,
-        isAvailable: true, // Nuevo campo
       },
     });
 
-    const totalPages = Math.ceil(totalCars / limit);
+    const totalPages = Math.ceil(totalAutos / limit);
 
     res.status(200).json({
-      cars: cars.map((car) => ({
-        id: car.id,
-        brand: car.brand,
-        model: car.model,
-        year: car.year,
-        category: car.carType,
-        pricePerDay: car.pricePerDay,
-        rentalCount: car.rentalCount,
-        location: car.location,
-        imageUrl: car.photos || ['/placeholder-car.jpg'],
+      cars: autos.map((auto) => ({
+        id: auto.idAuto,
+        brand: auto.marca,
+        model: auto.modelo,
+        year: auto.año,
+        category: auto.tipo,
+        pricePerDay: auto.precioRentaDiario,
+        location: auto.ubicacion,
+        imageUrl: auto.imagenes || ['/placeholder-car.jpg'],
         host: {
-          id: car.user.id,
-          email: car.user.email,
+          id: auto.propietario.idUsuario,
+          email: auto.propietario.email,
         },
-        unavailableDates: car.unavailableDates,
-        extraEquipment: car.extraEquipment,
-        seats: car.seats,
-        transmission: car.transmission,
-        color: car.color,
-        isAvailable: car.isAvailable, // Usar el valor real de la base de datos
-        
+        seats: auto.asientos,
+        transmission: auto.transmision,
+        color: auto.color,
       })),
-      totalCars,
+      totalCars: totalAutos,
       currentPage: pageNumber,
       totalPages,
     });
@@ -247,7 +272,13 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
   }
 });
 
-// GET /api/cars/my-cars - Listar autos del host con filtros y ordenamiento (HU 3)
+
+
+
+
+
+
+
 router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
@@ -256,65 +287,61 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.CarWhereInput = { userId };
+    const where: Prisma.AutoWhereInput = { idPropietario: userId };
 
     if (brand) {
-      where.brand = { contains: brand as string, mode: 'insensitive' };
+      where.marca = { contains: brand as string, mode: 'insensitive' };
     }
     if (model) {
-      where.model = { contains: model as string, mode: 'insensitive' };
+      where.modelo = { contains: model as string, mode: 'insensitive' };
     }
     if (carType) {
-      where.carType = { equals: carType as string };
+      where.tipo = { equals: carType as string };
     }
     if (transmission) {
-      where.transmission = { equals: transmission as string };
+      where.transmision = { equals: transmission as Transmision };
     }
 
-    let orderBy: Prisma.CarOrderByWithRelationInput = {};
+    let orderBy: Prisma.AutoOrderByWithRelationInput = {};
     switch (sortBy) {
       case 'priceAsc':
-        orderBy = { pricePerDay: 'asc' };
+        orderBy = { precioRentaDiario: 'asc' };
         break;
       case 'priceDesc':
-        orderBy = { pricePerDay: 'desc' };
+        orderBy = { precioRentaDiario: 'desc' };
         break;
       case 'rentalCount':
-        orderBy = { rentalCount: 'desc' };
+        orderBy = { vecesAlquilado: 'desc' };
         break;
       case 'yearAsc':
-        orderBy = { year: 'asc' };
+        orderBy = { año: 'asc' };
         break;
       case 'yearDesc':
-        orderBy = { year: 'desc' };
+        orderBy = { año: 'desc' };
         break;
       default:
-        orderBy = { createdAt: 'desc' };
+        orderBy = { idAuto: 'desc' };
         break;
     }
 
-    const totalCars = await prisma.car.count({ where });
-    const cars = await prisma.car.findMany({
+    const totalCars = await db.auto.count({ where });
+    const cars = await db.auto.findMany({
       where,
       skip,
       take: limit,
       orderBy,
       select: {
-        id: true,
-        brand: true,
-        model: true,
-        year: true,
-        carType: true,
+        idAuto: true,
+        marca: true,
+        modelo: true,
+        año: true,
+        tipo: true,
         color: true,
-        pricePerDay: true,
-        seats: true,
-        transmission: true,
-        photos: true,
-        createdAt: true,
-        unavailableDates: true,
-        extraEquipment: true,
-        rentalCount: true,
-        isAvailable: true, // Nuevo campo
+        precioRentaDiario: true,
+        asientos: true,
+        transmision: true,
+        imagenes: true,
+        vecesAlquilado: true,
       },
     });
 
@@ -322,20 +349,17 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
 
     res.status(200).json({
       cars: cars.map((car) => ({
-        id: car.id,
-        brand: car.brand,
-        model: car.model,
-        year: car.year,
-        category: car.carType,
-        pricePerDay: car.pricePerDay,
-        seats: car.seats,
-        transmission: car.transmission,
+        id: car.idAuto,
+        brand: car.marca,
+        model: car.modelo,
+        year: car.año,
+        category: car.tipo,
+        pricePerDay: car.precioRentaDiario,
+        seats: car.asientos,
+        transmission: car.transmision,
         color: car.color,
-        imageUrl: car.photos || ['/placeholder-car.jpg'],
-        isAvailable: car.isAvailable, // Usar el valor real de la base de datos
-        unavailableDates: car.unavailableDates,
-        extraEquipment: car.extraEquipment,
-        rentalCount: car.rentalCount,
+        imageUrl: car.imagenes || ['/placeholder-car.jpg'],
+        rentalCount: car.vecesAlquilado,
       })),
       totalCars,
       currentPage: page,
@@ -346,102 +370,136 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
   }
 });
 
-// GET /api/cars/:id - Obtener detalles de un auto
+
+
+
+
+
+
+// GET /api/autos/:id - Obtener detalles de un auto
 router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
-    const carId = parseInt(req.params.id);
-    const car = await prisma.car.findUnique({
-      where: { id: carId },
+    const autoId = parseInt(req.params.id);
+    const auto = await db.auto.findUnique({
+      where: { idAuto: autoId },
       select: {
-        id: true,
-        brand: true,
-        model: true,
-        year: true,
-        carType: true,
+        idAuto: true,
+        marca: true,
+        modelo: true,
+        año: true,
+        tipo: true,
         color: true,
-        pricePerDay: true,
-        seats: true,
-        transmission: true,
-        photos: true,
-        createdAt: true,
-        unavailableDates: true,
-        extraEquipment: true,
-        rentalCount: true,
-        location: true,
-        kilometers: true,
-        licensePlate: true,
-        fuelType: true,
-        description: true,
-        isAvailable: true, 
+        precioRentaDiario: true,
+        asientos: true,
+        transmision: true,
+        imagenes: true,
+        vecesAlquilado: true,
+        ubicacion: true,
+        kilometraje: true,
+        placa: true,
+        combustible: true,
+        descripcion: true,
       },
     });
 
-    if (!car) {
+    if (!auto) {
       res.status(404).json({ error: 'Auto no encontrado' });
       return;
     }
 
     res.status(200).json({
-      id: car.id,
-      brand: car.brand,
-      model: car.model,
-      year: car.year,
-      category: car.carType,
-      pricePerDay: car.pricePerDay,
-      seats: car.seats,
-      transmission: car.transmission,
-      color: car.color,
-      imageUrl: car.photos,
-      isAvailable: car.isAvailable, // Usar el valor real de la base de datos
-      unavailableDates: car.unavailableDates,
-      extraEquipment: car.extraEquipment,
-      rentalCount: car.rentalCount,
-      location: car.location,
-      kilometers: car.kilometers,
-      licensePlate: car.licensePlate,
-      fuelType: car.fuelType,
-      description: car.description || '',
+      id: auto.idAuto,
+      brand: auto.marca,
+      model: auto.modelo,
+      year: auto.año,
+      category: auto.tipo,
+      pricePerDay: auto.precioRentaDiario,
+      seats: auto.asientos,
+      transmission: auto.transmision,
+      color: auto.color,
+      imageUrl: auto.imagenes,
+      rentalCount: auto.vecesAlquilado,
+      location: auto.ubicacion,
+      kilometers: auto.kilometraje,
+      licensePlate: auto.placa,
+      fuelType: auto.combustible,
+      description: auto.descripcion || '',
     });
   } catch (err) {
     next(err);
   }
 });
 
-// DELETE /api/cars/:id - Eliminar un auto
+
+
+
+
+
+
+
+
+// DELETE /api/autos/:id - Eliminar un auto
 router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
-    const carId = parseInt(req.params.id);
-    const car = await prisma.car.findUnique({ where: { id: carId } });
+    const autoId = parseInt(req.params.id);
+    const auto = await db.auto.findUnique({ where: { idAuto: autoId } });
 
-    if (!car) {
+    if (!auto) {
       res.status(404).json({ error: 'Auto no encontrado' });
       return;
     }
 
-    if (car.userId !== req.user!.id) {
+    if (auto.idPropietario !== req.user!.id) {
       res.status(403).json({ error: 'No autorizado para eliminar este auto' });
       return;
     }
 
-    await prisma.car.delete({ where: { id: carId } });
+    // Verificar si el auto tiene reservas activas
+    const activeRentals = await db.reserva.findMany({
+      where: {
+        idAuto: autoId,
+        fechaInicio: { lte: new Date() },  // ajusta fechaInicio y fechaFin según tu modelo Reserva
+        fechaFin: { gte: new Date() }
+      }
+    });
+
+    if (activeRentals.length > 0) {
+      res.status(400).json({
+        error: 'No se puede eliminar un auto con reservas activas.'
+      });
+      return;
+    }
+
+    await db.auto.delete({ where: { idAuto: autoId } });
     res.status(200).json({ success: true });
   } catch (err) {
     next(err);
   }
 });
 
-// PUT /api/cars/:id - Actualizar un auto
+
+
+
+
+
+
+// PUT /api/autos/:id - Actualizar un auto
 router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
-    const carId = parseInt(req.params.id);
-    const car = await prisma.car.findUnique({ where: { id: carId } });
+    const autoId = parseInt(req.params.id);
+    const auto = await db.auto.findUnique({
+      where: { idAuto: autoId },
+      include: {
+        imagenes: true
+      }
+    });
 
-    if (!car) {
+    if (!auto) {
       res.status(404).json({ error: 'Auto no encontrado' });
       return;
     }
 
-    if (car.userId !== req.user!.id) {
+    if (auto.idPropietario !== req.user!.id) {
       res.status(403).json({ error: 'No autorizado para actualizar este auto' });
       return;
     }
@@ -460,48 +518,54 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       extraEquipment,
       description,
       fuelType,
-      kilometers, // 👈 string
+      kilometers,
     } = req.body;
-    
-    const updatedCar = await prisma.car.update({
-      where: { id: carId },
-      data: {
-        brand: brand || car.brand,
-        model: model || car.model,
-        year: year ? parseInt(year) : car.year,
-        carType: category || car.carType,
-        color: color || car.color,
-        pricePerDay: pricePerDay ? parseFloat(pricePerDay) : car.pricePerDay,
-        seats: seats ? parseInt(seats) : car.seats,
-        transmission: transmission || car.transmission,
-        fuelType: fuelType || car.fuelType, // ✅ string
-        kilometers: kilometers || car.kilometers, // ✅ mantener como string
-        photos: Array.isArray(imageUrls) ? imageUrls : imageUrls ? [imageUrls] : car.photos,
-        extraEquipment: extraEquipment !== undefined ? extraEquipment : car.extraEquipment,
-        isAvailable: isAvailable !== undefined ? isAvailable : car.isAvailable,
-        description: description || car.description,
-      },
+
+    const data: any = {
+      marca: brand || auto.marca,
+      modelo: model || auto.modelo,
+      año: year ? parseInt(year) : auto.año,
+      tipo: category || auto.tipo,
+      color: color || auto.color,
+      precioRentaDiario: pricePerDay ? parseFloat(pricePerDay) : auto.precioRentaDiario,
+      asientos: seats ? parseInt(seats) : auto.asientos,
+      transmision: transmission || auto.transmision,
+      combustible: fuelType || auto.combustible,
+      kilometraje: kilometers !== undefined ? kilometers : auto.kilometraje,
+      descripcion: description || auto.descripcion,
+    };
+
+    // Solo actualiza imágenes si imageUrls es un array no vacío
+    if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+      data.imagenes = {
+        deleteMany: {}, // Borra todas las imágenes actuales
+        create: imageUrls.map((url: string) => ({
+          direccionImagen: url,
+        })),
+      };
+    }
+
+
+    const updatedAuto = await db.auto.update({
+      where: { idAuto: autoId },
+      data,
     });
-    
-    
+    7
 
     res.status(200).json({
       success: true,
-      car: {
-        id: updatedCar.id,
-        brand: updatedCar.brand,
-        model: updatedCar.model,
-        year: updatedCar.year,
-        category: updatedCar.carType,
-        pricePerDay: updatedCar.pricePerDay,
-        seats: updatedCar.seats,
-        transmission: updatedCar.transmission,
-        color: updatedCar.color,
-        imageUrl: car.photos || ['/placeholder-car.jpg'],
-        isAvailable: updatedCar.isAvailable, // Usar el valor real de la base de datos
-        unavailableDates: updatedCar.unavailableDates,
-        extraEquipment: updatedCar.extraEquipment,
-        description: updatedCar.description,
+      auto: {
+        id: updatedAuto.idAuto,
+        brand: updatedAuto.marca,
+        model: updatedAuto.modelo,
+        year: updatedAuto.año,
+        category: updatedAuto.tipo,
+        pricePerDay: updatedAuto.precioRentaDiario,
+        seats: updatedAuto.asientos,
+        transmission: updatedAuto.transmision,
+        color: updatedAuto.color,
+        // imageUrl: updatedAuto.imagenes.map(img => img.direccionImagen),
+        description: updatedAuto.descripcion,
       },
     });
   } catch (err) {
@@ -509,50 +573,82 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
   }
 });
 
-// POST /api/cars - Crear un auto
+
+
+
+
+
+
+
+
+// POST /api/autos - Crear un auto
 router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const {
-      location,
-      brand,
-      model,
-      year,
-      carType,
+      location,         // nombre de la ubicación, ej "Cochabamba"
+      brand,            // marca
+      model,            // modelo
+      year,             // año
+      carType,          // tipo
       color,
-      pricePerDay,
-      kilometers,
-      licensePlate,
-      transmission,
-      fuelType,
-      seats,
+      pricePerDay,      // precioRentaDiario
+      kilometers,       // kilometraje
+      licensePlate,     // placa
+      transmission,     // transmision
+      fuelType,         // combustible
+      seats,            // asientos
       description,
+      montoGarantia,
+      soat,
       photoUrls,
-      extraEquipment,
-    } = req.body as CarRequestBody;
+      capacidadMaletero,
+    } = req.body;
 
-    if (!location || !brand || !year || !pricePerDay || !kilometers || !licensePlate || !transmission || !fuelType || !seats) {
+    // Validar campos obligatorios mínimos
+    if (
+      !location ||
+      !brand ||
+      !year ||
+      !pricePerDay ||
+      !kilometers ||
+      !licensePlate ||
+      !transmission ||
+      !fuelType ||
+      !seats
+    ) {
       res.status(400).json({ error: 'Faltan campos obligatorios' });
       return;
     }
 
-    const placaRepetida = await prisma.car.findFirst({
-      where: {
-        licensePlate
-      },
+    // Buscar idUbicacion según el nombre recibido (location)
+    const ubicacionEncontrada = await db.ubicacion.findFirst({
+      where: { departamento: location, esActiva: true },
     });
-    
+
+    if (!ubicacionEncontrada) {
+      res.status(400).json({ error: `La ubicación '${location}' no existe o no está activa.` });
+      return;
+    }
+
+    // Validar placa única
+    const placaRepetida = await db.auto.findFirst({
+      where: { placa: licensePlate },
+    });
+
     if (placaRepetida) {
       res.status(409).json({ message: 'La placa de este auto ya está registrada' });
       return;
     }
 
-    let photoPaths: string[] = [];
+    // Validar fotos URLs o subir fotos
+    let imagenesData: { direccionImagen: string }[] = [];
+
     if (photoUrls && Array.isArray(photoUrls)) {
       if (photoUrls.length < 3 || photoUrls.length > 5) {
         res.status(400).json({ error: 'Debes proporcionar entre 3 y 5 URLs de fotos' });
         return;
       }
-      photoPaths = photoUrls;
+      imagenesData = photoUrls.map((url: string) => ({ direccionImagen: url }));
     } else if (req.files && req.files.photos) {
       const photoFiles = req.files.photos;
       const photos: UploadedPhoto[] = Array.isArray(photoFiles) ? photoFiles : [photoFiles as UploadedPhoto];
@@ -566,94 +662,85 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
         const fileName = `${Date.now()}-${photo.name}`;
         const filePath = path.join(__dirname, '../../Uploads', fileName);
         await photo.mv(filePath);
-        photoPaths.push(`/uploads/${fileName}`);
+        imagenesData.push({ direccionImagen: `/uploads/${fileName}` });
       }
     } else {
       res.status(400).json({ error: 'Debes subir al menos 3 fotos o proporcionar URLs' });
       return;
     }
 
-    const newCar = await prisma.car.create({
+    // para la transmision
+
+    let transmisionEnum: Transmision;
+
+    if (typeof transmission === 'string') {
+      const transUpper = transmission.toUpperCase();
+      if (transUpper === Transmision.AUTOMATICO || transUpper === Transmision.MANUAL) {
+        transmisionEnum = transUpper as Transmision;
+      } else {
+        res.status(400).json({ error: 'Transmisión inválida. Debe ser AUTOMATICO o MANUAL.' });
+        return;
+      }
+    } else {
+      res.status(400).json({ error: 'Transmisión inválida.' });
+      return;
+    }
+
+    // para combustible
+    let combustibleEnum: Combustible;
+    if (typeof fuelType === 'string') {
+      const fuelUpper = fuelType.toUpperCase();
+      if (
+        fuelUpper === Combustible.GASOLINA ||
+        fuelUpper === Combustible.DIESEL ||
+        fuelUpper === Combustible.ELECTRICO ||
+        fuelUpper === Combustible.HIBRIDO
+      ) {
+        combustibleEnum = fuelUpper as Combustible;
+      } else {
+        res.status(400).json({ error: 'Combustible inválido. Debe ser GASOLINA, DIESEL, ELECTRICO o HIBRIDO.' });
+        return;
+      }
+    } else {
+      res.status(400).json({ error: 'Combustible inválido.' });
+      return;
+    }
+
+    // Crear el auto con los campos mapeados y parseados
+    const newAuto = await db.auto.create({
       data: {
-        userId: req.user!.id,
-        location,
-        brand,
-        model: model || undefined,
-        year: parseInt(year),
-        carType: carType || null,
+        idPropietario: req.user!.id,
+        idUbicacion: ubicacionEncontrada.idUbicacion,
+        marca: brand,
+        modelo: model || undefined,
+        año: parseInt(year),
+        tipo: carType || null,
         color: color || undefined,
-        pricePerDay: parseFloat(pricePerDay),
-        kilometers,
-        licensePlate,
-        transmission,
-        fuelType,
-        seats: parseInt(seats),
-        description: description || null,
-        photos: photoPaths,
-        extraEquipment: extraEquipment || [],
-        isAvailable: true, // Valor por defecto
+        precioRentaDiario: parseFloat(pricePerDay),
+        kilometraje: parseInt(kilometers),
+        placa: licensePlate,
+        transmision: transmisionEnum,
+        combustible: combustibleEnum,
+        asientos: parseInt(seats),
+        descripcion: description || null,
+        montoGarantia: montoGarantia ? parseFloat(montoGarantia) : 0,
+        soat: soat || '',
+        capacidadMaletero: capacidadMaletero ? parseInt(capacidadMaletero) : 0,
+        imagenes: {
+          create: imagenesData,
+        },
       },
+      include: { imagenes: true },
     });
 
-    res.status(201).json({ success: true, car: newCar });
+    res.status(201).json({ success: true, auto: newAuto });
   } catch (err: any) {
-    console.error('Error en POST /api/cars:', err.message, err.stack);
+    console.error('Error en POST /api/autos:', err.message, err.stack);
     res.status(500).json({ error: 'Error interno del servidor', details: err.message });
     next(err);
   }
 });
 
-// PATCH /api/cars/:id/availability - Actualizar fechas de no disponibilidad
-router.patch('/:id/availability', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
-  try {
-    const carId = parseInt(req.params.id);
-    const { unavailableDates } = req.body;
 
-    const car = await prisma.car.findUnique({ where: { id: carId } });
-
-    if (!car) {
-      res.status(404).json({ error: 'Auto no encontrado' });
-      return;
-    }
-
-    if (car.userId !== req.user!.id) {
-      res.status(403).json({ error: 'No autorizado para actualizar este auto' });
-      return;
-    }
-
-    if (!Array.isArray(unavailableDates)) {
-      res.status(400).json({ error: 'unavailableDates debe ser un arreglo de fechas' });
-      return;
-    }
-
-    const updatedCar = await prisma.car.update({
-      where: { id: carId },
-      data: {
-        unavailableDates,
-      },
-    });
-
-    res.status(200).json({
-      success: true,
-      car: {
-        id: updatedCar.id,
-        brand: updatedCar.brand,
-        model: updatedCar.model,
-        year: updatedCar.year,
-        category: updatedCar.carType,
-        pricePerDay: updatedCar.pricePerDay,
-        seats: updatedCar.seats,
-        transmission: updatedCar.transmission,
-        color: updatedCar.color,
-        imageUrl: updatedCar.photos[0] || '/placeholder-car.jpg',
-        isAvailable: updatedCar.isAvailable, // Usar el valor real de la base de datos
-        unavailableDates: updatedCar.unavailableDates,
-        extraEquipment: updatedCar.extraEquipment,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
 
 export default router;

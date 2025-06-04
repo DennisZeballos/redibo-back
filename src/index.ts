@@ -6,7 +6,6 @@ import authRoutes from './routes/auth';
 import path from 'path';
 import cors from 'cors';
 import hostRoutes from './routes/hosts';
-import availabilityRoutes from './routes/availability'; 
 
 
 
@@ -51,7 +50,6 @@ app.use('/uploads', express.static(path.join(__dirname, '../Uploads')));
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
-app.use('/api/availability', availabilityRoutes); 
 
 // Manejo de errores
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -1,16 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { FileArray } from 'express-fileupload'; // Import FileArray
+import { FileArray } from 'express-fileupload';
 
-// Definimos una interfaz común para el objeto req con user y files
 export interface AuthRequest extends Request {
   user?: { id: number; role: string };
-  files?: FileArray | null; // Use FileArray from express-fileupload
+  files?: FileArray | null;
 }
 
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
     res.status(401).json({ error: 'Token no proporcionado' });
@@ -29,7 +28,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 
 export const isHost = (req: AuthRequest, res: Response, next: NextFunction): void => {
   if (!req.user || req.user.role !== 'host') {
-    res.status(403).json({ error: 'Acceso denegado: se requiere rol de host' });
+    res.status(403).json({ error: 'Acceso denegado: se requiere ser host' });
     return;
   }
   next();

@@ -120,52 +120,212 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.UserScalarFieldEnum = {
-  id: 'id',
+exports.Prisma.UsuarioScalarFieldEnum = {
+  idUsuario: 'idUsuario',
+  nombreCompleto: 'nombreCompleto',
   email: 'email',
-  password: 'password',
-  role: 'role',
-  name: 'name',
-  location: 'location',
+  contraseña: 'contraseña',
+  fechaNacimiento: 'fechaNacimiento',
+  telefono: 'telefono',
+  registradoCon: 'registradoCon',
+  fechaRegistro: 'fechaRegistro',
+  verificado: 'verificado',
+  host: 'host',
+  driverBool: 'driverBool',
+  fotoPerfil: 'fotoPerfil',
+  codigoVerificacion: 'codigoVerificacion',
+  bloqueado: 'bloqueado',
+  fechaBloqueado: 'fechaBloqueado',
+  intentosFallidos: 'intentosFallidos',
+  direccion: 'direccion',
+  esAdmin: 'esAdmin',
+  edicionesNombre: 'edicionesNombre',
+  edicionesFecha: 'edicionesFecha',
+  edicionesTelefono: 'edicionesTelefono',
+  metodoPago: 'metodoPago',
+  numeroTarjeta: 'numeroTarjeta',
+  fechaExpiracion: 'fechaExpiracion',
+  titular: 'titular',
+  imagenQr: 'imagenQr',
+  detallesMetodoPago: 'detallesMetodoPago'
+};
+
+exports.Prisma.VerificacionesScalarFieldEnum = {
+  idCodigo: 'idCodigo',
+  idUsuario: 'idUsuario',
+  codigo: 'codigo',
+  tipo: 'tipo',
+  creadoEn: 'creadoEn',
+  expiracion: 'expiracion',
+  usado: 'usado'
+};
+
+exports.Prisma.TerminosCondicionesScalarFieldEnum = {
+  idAceptacion: 'idAceptacion',
+  idUsuario: 'idUsuario',
+  versionTerminos: 'versionTerminos',
+  fechaAceptacion: 'fechaAceptacion'
+};
+
+exports.Prisma.DriverScalarFieldEnum = {
+  idDriver: 'idDriver',
+  idUsuario: 'idUsuario',
+  sexo: 'sexo',
+  telefono: 'telefono',
+  licencia: 'licencia',
+  fechaEmision: 'fechaEmision',
+  fechaExpiracion: 'fechaExpiracion',
+  tipoLicencia: 'tipoLicencia',
+  añosExperiencia: 'añosExperiencia',
+  disponible: 'disponible',
+  anversoUrl: 'anversoUrl',
+  reversoUrl: 'reversoUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.CarScalarFieldEnum = {
+exports.Prisma.UsuarioDriverScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
-  location: 'location',
-  brand: 'brand',
-  model: 'model',
-  year: 'year',
-  carType: 'carType',
+  idUsuario: 'idUsuario',
+  idDriver: 'idDriver',
+  fechaAsignacion: 'fechaAsignacion'
+};
+
+exports.Prisma.NotificacionScalarFieldEnum = {
+  idNotificacion: 'idNotificacion',
+  idUsuario: 'idUsuario',
+  titulo: 'titulo',
+  mensaje: 'mensaje',
+  idEntidad: 'idEntidad',
+  tipoEntidad: 'tipoEntidad',
+  leido: 'leido',
+  leidoEn: 'leidoEn',
+  creadoEn: 'creadoEn',
+  actualizadoEn: 'actualizadoEn',
+  haSidoBorrada: 'haSidoBorrada',
+  tipo: 'tipo',
+  prioridad: 'prioridad'
+};
+
+exports.Prisma.UbicacionScalarFieldEnum = {
+  idUbicacion: 'idUbicacion',
+  departamento: 'departamento',
+  nombre: 'nombre',
+  descripcion: 'descripcion',
+  latitud: 'latitud',
+  longitud: 'longitud',
+  esActiva: 'esActiva'
+};
+
+exports.Prisma.AutoScalarFieldEnum = {
+  idAuto: 'idAuto',
+  idPropietario: 'idPropietario',
+  idUbicacion: 'idUbicacion',
+  marca: 'marca',
+  modelo: 'modelo',
+  descripcion: 'descripcion',
+  precioRentaDiario: 'precioRentaDiario',
+  montoGarantia: 'montoGarantia',
+  kilometraje: 'kilometraje',
+  calificacionPromedio: 'calificacionPromedio',
+  totalComentarios: 'totalComentarios',
+  tipo: 'tipo',
+  año: 'año',
+  placa: 'placa',
+  soat: 'soat',
   color: 'color',
-  pricePerDay: 'pricePerDay',
-  kilometers: 'kilometers',
-  licensePlate: 'licensePlate',
-  transmission: 'transmission',
-  fuelType: 'fuelType',
-  seats: 'seats',
-  description: 'description',
-  photos: 'photos',
-  rentalCount: 'rentalCount',
-  rating: 'rating',
-  discount: 'discount',
-  unavailableDates: 'unavailableDates',
-  extraEquipment: 'extraEquipment',
-  isAvailable: 'isAvailable',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  estado: 'estado',
+  fechaAdquisicion: 'fechaAdquisicion',
+  asientos: 'asientos',
+  capacidadMaletero: 'capacidadMaletero',
+  transmision: 'transmision',
+  combustible: 'combustible',
+  diasTotalRenta: 'diasTotalRenta',
+  vecesAlquilado: 'vecesAlquilado'
 };
 
-exports.Prisma.RentalScalarFieldEnum = {
-  id: 'id',
-  carId: 'carId',
-  userId: 'userId',
-  startDate: 'startDate',
-  endDate: 'endDate',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+exports.Prisma.ImagenScalarFieldEnum = {
+  idImagen: 'idImagen',
+  idAuto: 'idAuto',
+  direccionImagen: 'direccionImagen'
+};
+
+exports.Prisma.DisponibilidadScalarFieldEnum = {
+  idDisponibilidad: 'idDisponibilidad',
+  idAuto: 'idAuto',
+  fechaInicio: 'fechaInicio',
+  fechaFin: 'fechaFin',
+  motivo: 'motivo',
+  descripcion: 'descripcion'
+};
+
+exports.Prisma.ReservaScalarFieldEnum = {
+  idReserva: 'idReserva',
+  fechaInicio: 'fechaInicio',
+  fechaFin: 'fechaFin',
+  idAuto: 'idAuto',
+  idCliente: 'idCliente',
+  estado: 'estado',
+  fechaSolicitud: 'fechaSolicitud',
+  fechaAprobacion: 'fechaAprobacion',
+  fechaLimitePago: 'fechaLimitePago',
+  montoTotal: 'montoTotal',
+  kilometrajeInicial: 'kilometrajeInicial',
+  kilometrajeFinal: 'kilometrajeFinal',
+  estaPagada: 'estaPagada'
+};
+
+exports.Prisma.PagoScalarFieldEnum = {
+  idPago: 'idPago',
+  idReserva: 'idReserva',
+  monto: 'monto',
+  fechaPago: 'fechaPago',
+  metodoPago: 'metodoPago',
+  referencia: 'referencia',
+  comprobante: 'comprobante',
+  tipo: 'tipo'
+};
+
+exports.Prisma.GarantiaScalarFieldEnum = {
+  idGarantia: 'idGarantia',
+  idReserva: 'idReserva',
+  monto: 'monto',
+  fechaDeposito: 'fechaDeposito',
+  fechaLiberacion: 'fechaLiberacion',
+  estado: 'estado',
+  comprobante: 'comprobante'
+};
+
+exports.Prisma.HistorialMantenimientoScalarFieldEnum = {
+  idHistorial: 'idHistorial',
+  idAuto: 'idAuto',
+  fechaInicio: 'fechaInicio',
+  fechaFin: 'fechaFin',
+  descripcion: 'descripcion',
+  costo: 'costo',
+  tipoMantenimiento: 'tipoMantenimiento',
+  kilometraje: 'kilometraje'
+};
+
+exports.Prisma.ComentarioScalarFieldEnum = {
+  idComentario: 'idComentario',
+  idAuto: 'idAuto',
+  idUsuario: 'idUsuario',
+  contenido: 'contenido',
+  calificacion: 'calificacion',
+  fechaCreacion: 'fechaCreacion',
+  idReserva: 'idReserva'
+};
+
+exports.Prisma.CalificacionUsuarioScalarFieldEnum = {
+  idCalificacion: 'idCalificacion',
+  idCalificador: 'idCalificador',
+  idCalificado: 'idCalificado',
+  puntuacion: 'puntuacion',
+  comentario: 'comentario',
+  fechaCreacion: 'fechaCreacion',
+  idReserva: 'idReserva',
+  tipoCalificacion: 'tipoCalificacion'
 };
 
 exports.Prisma.SortOrder = {
@@ -182,12 +342,114 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.RegistradoCon = exports.$Enums.RegistradoCon = {
+  email: 'email',
+  google: 'google'
+};
 
+exports.MetodoPago = exports.$Enums.MetodoPago = {
+  QR: 'QR',
+  TARJETA_DEBITO: 'TARJETA_DEBITO',
+  EFECTIVO: 'EFECTIVO'
+};
+
+exports.TipoVerificacion = exports.$Enums.TipoVerificacion = {
+  recuperacion: 'recuperacion',
+  verificacion: 'verificacion'
+};
+
+exports.TipoDeNotificacion = exports.$Enums.TipoDeNotificacion = {
+  RESERVA_SOLICITADA: 'RESERVA_SOLICITADA',
+  RESERVA_APROBADA: 'RESERVA_APROBADA',
+  RESERVA_RECHAZADA: 'RESERVA_RECHAZADA',
+  DEPOSITO_CONFIRMADO: 'DEPOSITO_CONFIRMADO',
+  DEPOSITO_RECIBIDO: 'DEPOSITO_RECIBIDO',
+  RESERVA_CANCELADA: 'RESERVA_CANCELADA',
+  ALQUILER_FINALIZADO: 'ALQUILER_FINALIZADO',
+  RESERVA_MODIFICADA: 'RESERVA_MODIFICADA',
+  VEHICULO_CALIFICADO: 'VEHICULO_CALIFICADO'
+};
+
+exports.PrioridadNotificacion = exports.$Enums.PrioridadNotificacion = {
+  BAJA: 'BAJA',
+  MEDIA: 'MEDIA',
+  ALTA: 'ALTA'
+};
+
+exports.EstadoAuto = exports.$Enums.EstadoAuto = {
+  ACTIVO: 'ACTIVO',
+  INACTIVO: 'INACTIVO'
+};
+
+exports.Transmision = exports.$Enums.Transmision = {
+  AUTOMATICO: 'AUTOMATICO',
+  MANUAL: 'MANUAL'
+};
+
+exports.Combustible = exports.$Enums.Combustible = {
+  GASOLINA: 'GASOLINA',
+  DIESEL: 'DIESEL',
+  ELECTRICO: 'ELECTRICO',
+  HIBRIDO: 'HIBRIDO',
+  GAS: 'GAS'
+};
+
+exports.MotivoNoDisponibilidad = exports.$Enums.MotivoNoDisponibilidad = {
+  MANTENIMIENTO: 'MANTENIMIENTO',
+  REPARACION: 'REPARACION',
+  USO_PERSONAL: 'USO_PERSONAL',
+  OTRO: 'OTRO'
+};
+
+exports.EstadoReserva = exports.$Enums.EstadoReserva = {
+  SOLICITADA: 'SOLICITADA',
+  APROBADA: 'APROBADA',
+  RECHAZADA: 'RECHAZADA',
+  CONFIRMADA: 'CONFIRMADA',
+  CANCELADA: 'CANCELADA',
+  EN_CURSO: 'EN_CURSO',
+  FINALIZADA: 'FINALIZADA'
+};
+
+exports.TipoPago = exports.$Enums.TipoPago = {
+  RENTA: 'RENTA',
+  GARANTIA: 'GARANTIA'
+};
+
+exports.EstadoGarantia = exports.$Enums.EstadoGarantia = {
+  DEPOSITADA: 'DEPOSITADA',
+  LIBERADA: 'LIBERADA',
+  RETENIDA: 'RETENIDA'
+};
+
+exports.TipoMantenimiento = exports.$Enums.TipoMantenimiento = {
+  PREVENTIVO: 'PREVENTIVO',
+  CORRECTIVO: 'CORRECTIVO',
+  REVISION: 'REVISION'
+};
+
+exports.TipoCalificacionUsuario = exports.$Enums.TipoCalificacionUsuario = {
+  ARRENDADOR: 'ARRENDADOR',
+  ARRENDATARIO: 'ARRENDATARIO'
+};
 
 exports.Prisma.ModelName = {
-  User: 'User',
-  Car: 'Car',
-  Rental: 'Rental'
+  Usuario: 'Usuario',
+  Verificaciones: 'Verificaciones',
+  TerminosCondiciones: 'TerminosCondiciones',
+  Driver: 'Driver',
+  UsuarioDriver: 'UsuarioDriver',
+  Notificacion: 'Notificacion',
+  Ubicacion: 'Ubicacion',
+  Auto: 'Auto',
+  Imagen: 'Imagen',
+  Disponibilidad: 'Disponibilidad',
+  Reserva: 'Reserva',
+  Pago: 'Pago',
+  Garantia: 'Garantia',
+  HistorialMantenimiento: 'HistorialMantenimiento',
+  Comentario: 'Comentario',
+  CalificacionUsuario: 'CalificacionUsuario'
 };
 
 /**
