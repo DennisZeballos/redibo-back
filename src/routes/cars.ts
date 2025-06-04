@@ -254,7 +254,7 @@ router.get('/', async (req: AuthRequest, res: express.Response, next: express.Ne
         category: auto.tipo,
         pricePerDay: auto.precioRentaDiario,
         location: auto.ubicacion,
-        imageUrl: auto.imagenes || ['/placeholder-car.jpg'],
+        imageUrl: auto.imagenes.map((img) => img.direccionImagen),
         host: {
           id: auto.propietario.idUsuario,
           email: auto.propietario.email,
@@ -358,7 +358,7 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
         seats: car.asientos,
         transmission: car.transmision,
         color: car.color,
-        imageUrl: car.imagenes || ['/placeholder-car.jpg'],
+        imageUrl: car.imagenes.map((img) => img.direccionImagen),
         rentalCount: car.vecesAlquilado,
       })),
       totalCars,
@@ -417,7 +417,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
       seats: auto.asientos,
       transmission: auto.transmision,
       color: auto.color,
-      imageUrl: auto.imagenes,
+    imageUrl: auto.imagenes.map((img) => img.direccionImagen),
       rentalCount: auto.vecesAlquilado,
       location: auto.ubicacion,
       kilometers: auto.kilometraje,
@@ -694,7 +694,8 @@ router.post('/', authenticateToken, isHost, async (req: AuthRequest, res: expres
         fuelUpper === Combustible.GASOLINA ||
         fuelUpper === Combustible.DIESEL ||
         fuelUpper === Combustible.ELECTRICO ||
-        fuelUpper === Combustible.HIBRIDO
+        fuelUpper === Combustible.HIBRIDO ||
+        fuelUpper === Combustible.GAS
       ) {
         combustibleEnum = fuelUpper as Combustible;
       } else {
