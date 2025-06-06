@@ -417,7 +417,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
       seats: auto.asientos,
       transmission: auto.transmision,
       color: auto.color,
-    imageUrl: auto.imagenes.map((img) => img.direccionImagen),
+      imageUrl: auto.imagenes.map((img) => img.direccionImagen),
       rentalCount: auto.vecesAlquilado,
       location: auto.ubicacion,
       kilometers: auto.kilometraje,
@@ -529,7 +529,9 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       color: color || auto.color,
       precioRentaDiario: pricePerDay ? parseFloat(pricePerDay) : auto.precioRentaDiario,
       asientos: seats ? parseInt(seats) : auto.asientos,
-      transmision: transmission || auto.transmision,
+      transmision: transmission
+        ? (transmission.toUpperCase() as Transmision)
+        : auto.transmision,
       combustible: fuelType || auto.combustible,
       kilometraje: kilometers !== undefined ? kilometers : auto.kilometraje,
       descripcion: description || auto.descripcion,
@@ -549,8 +551,11 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
     const updatedAuto = await db.auto.update({
       where: { idAuto: autoId },
       data,
+      include: {
+        imagenes: true,
+      },
     });
-    7
+
 
     res.status(200).json({
       success: true,
@@ -564,7 +569,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         seats: updatedAuto.asientos,
         transmission: updatedAuto.transmision,
         color: updatedAuto.color,
-        // imageUrl: updatedAuto.imagenes.map(img => img.direccionImagen),
+        imageUrl: updatedAuto.imagenes.map(img => img.direccionImagen),
         description: updatedAuto.descripcion,
       },
     });
