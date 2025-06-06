@@ -229,6 +229,7 @@ exports.Prisma.AutoScalarFieldEnum = {
   kilometraje: 'kilometraje',
   calificacionPromedio: 'calificacionPromedio',
   totalComentarios: 'totalComentarios',
+  estaDisponible: 'estaDisponible',
   tipo: 'tipo',
   año: 'año',
   placa: 'placa',

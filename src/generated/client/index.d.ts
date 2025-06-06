@@ -11297,6 +11297,7 @@ export namespace Prisma {
     kilometraje: number | null
     calificacionPromedio: number | null
     totalComentarios: number | null
+    estaDisponible: boolean | null
     tipo: string | null
     año: number | null
     placa: string | null
@@ -11324,6 +11325,7 @@ export namespace Prisma {
     kilometraje: number | null
     calificacionPromedio: number | null
     totalComentarios: number | null
+    estaDisponible: boolean | null
     tipo: string | null
     año: number | null
     placa: string | null
@@ -11351,6 +11353,7 @@ export namespace Prisma {
     kilometraje: number
     calificacionPromedio: number
     totalComentarios: number
+    estaDisponible: number
     tipo: number
     año: number
     placa: number
@@ -11412,6 +11415,7 @@ export namespace Prisma {
     kilometraje?: true
     calificacionPromedio?: true
     totalComentarios?: true
+    estaDisponible?: true
     tipo?: true
     año?: true
     placa?: true
@@ -11439,6 +11443,7 @@ export namespace Prisma {
     kilometraje?: true
     calificacionPromedio?: true
     totalComentarios?: true
+    estaDisponible?: true
     tipo?: true
     año?: true
     placa?: true
@@ -11466,6 +11471,7 @@ export namespace Prisma {
     kilometraje?: true
     calificacionPromedio?: true
     totalComentarios?: true
+    estaDisponible?: true
     tipo?: true
     año?: true
     placa?: true
@@ -11580,6 +11586,7 @@ export namespace Prisma {
     kilometraje: number
     calificacionPromedio: number | null
     totalComentarios: number
+    estaDisponible: boolean
     tipo: string
     año: number
     placa: string
@@ -11626,6 +11633,7 @@ export namespace Prisma {
     kilometraje?: boolean
     calificacionPromedio?: boolean
     totalComentarios?: boolean
+    estaDisponible?: boolean
     tipo?: boolean
     año?: boolean
     placa?: boolean
@@ -11661,6 +11669,7 @@ export namespace Prisma {
     kilometraje?: boolean
     calificacionPromedio?: boolean
     totalComentarios?: boolean
+    estaDisponible?: boolean
     tipo?: boolean
     año?: boolean
     placa?: boolean
@@ -11690,6 +11699,7 @@ export namespace Prisma {
     kilometraje?: boolean
     calificacionPromedio?: boolean
     totalComentarios?: boolean
+    estaDisponible?: boolean
     tipo?: boolean
     año?: boolean
     placa?: boolean
@@ -11719,6 +11729,7 @@ export namespace Prisma {
     kilometraje?: boolean
     calificacionPromedio?: boolean
     totalComentarios?: boolean
+    estaDisponible?: boolean
     tipo?: boolean
     año?: boolean
     placa?: boolean
@@ -11734,7 +11745,7 @@ export namespace Prisma {
     vecesAlquilado?: boolean
   }
 
-  export type AutoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"idAuto" | "idPropietario" | "idUbicacion" | "marca" | "modelo" | "descripcion" | "precioRentaDiario" | "montoGarantia" | "kilometraje" | "calificacionPromedio" | "totalComentarios" | "tipo" | "año" | "placa" | "soat" | "color" | "estado" | "fechaAdquisicion" | "asientos" | "capacidadMaletero" | "transmision" | "combustible" | "diasTotalRenta" | "vecesAlquilado", ExtArgs["result"]["auto"]>
+  export type AutoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"idAuto" | "idPropietario" | "idUbicacion" | "marca" | "modelo" | "descripcion" | "precioRentaDiario" | "montoGarantia" | "kilometraje" | "calificacionPromedio" | "totalComentarios" | "estaDisponible" | "tipo" | "año" | "placa" | "soat" | "color" | "estado" | "fechaAdquisicion" | "asientos" | "capacidadMaletero" | "transmision" | "combustible" | "diasTotalRenta" | "vecesAlquilado", ExtArgs["result"]["auto"]>
   export type AutoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     ubicacion?: boolean | UbicacionDefaultArgs<ExtArgs>
     propietario?: boolean | UsuarioDefaultArgs<ExtArgs>
@@ -11777,6 +11788,7 @@ export namespace Prisma {
       kilometraje: number
       calificacionPromedio: number | null
       totalComentarios: number
+      estaDisponible: boolean
       tipo: string
       año: number
       placa: string
@@ -12231,6 +12243,7 @@ export namespace Prisma {
     readonly kilometraje: FieldRef<"Auto", 'Int'>
     readonly calificacionPromedio: FieldRef<"Auto", 'Float'>
     readonly totalComentarios: FieldRef<"Auto", 'Int'>
+    readonly estaDisponible: FieldRef<"Auto", 'Boolean'>
     readonly tipo: FieldRef<"Auto", 'String'>
     readonly año: FieldRef<"Auto", 'Int'>
     readonly placa: FieldRef<"Auto", 'String'>
@@ -22164,6 +22177,7 @@ export namespace Prisma {
     kilometraje: 'kilometraje',
     calificacionPromedio: 'calificacionPromedio',
     totalComentarios: 'totalComentarios',
+    estaDisponible: 'estaDisponible',
     tipo: 'tipo',
     año: 'año',
     placa: 'placa',
@@ -23249,6 +23263,7 @@ export namespace Prisma {
     kilometraje?: IntFilter<"Auto"> | number
     calificacionPromedio?: FloatNullableFilter<"Auto"> | number | null
     totalComentarios?: IntFilter<"Auto"> | number
+    estaDisponible?: BoolFilter<"Auto"> | boolean
     tipo?: StringFilter<"Auto"> | string
     año?: IntFilter<"Auto"> | number
     placa?: StringFilter<"Auto"> | string
@@ -23283,6 +23298,7 @@ export namespace Prisma {
     kilometraje?: SortOrder
     calificacionPromedio?: SortOrderInput | SortOrder
     totalComentarios?: SortOrder
+    estaDisponible?: SortOrder
     tipo?: SortOrder
     año?: SortOrder
     placa?: SortOrder
@@ -23321,6 +23337,7 @@ export namespace Prisma {
     kilometraje?: IntFilter<"Auto"> | number
     calificacionPromedio?: FloatNullableFilter<"Auto"> | number | null
     totalComentarios?: IntFilter<"Auto"> | number
+    estaDisponible?: BoolFilter<"Auto"> | boolean
     tipo?: StringFilter<"Auto"> | string
     año?: IntFilter<"Auto"> | number
     soat?: StringFilter<"Auto"> | string
@@ -23354,6 +23371,7 @@ export namespace Prisma {
     kilometraje?: SortOrder
     calificacionPromedio?: SortOrderInput | SortOrder
     totalComentarios?: SortOrder
+    estaDisponible?: SortOrder
     tipo?: SortOrder
     año?: SortOrder
     placa?: SortOrder
@@ -23389,6 +23407,7 @@ export namespace Prisma {
     kilometraje?: IntWithAggregatesFilter<"Auto"> | number
     calificacionPromedio?: FloatNullableWithAggregatesFilter<"Auto"> | number | null
     totalComentarios?: IntWithAggregatesFilter<"Auto"> | number
+    estaDisponible?: BoolWithAggregatesFilter<"Auto"> | boolean
     tipo?: StringWithAggregatesFilter<"Auto"> | string
     año?: IntWithAggregatesFilter<"Auto"> | number
     placa?: StringWithAggregatesFilter<"Auto"> | string
@@ -24696,6 +24715,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -24730,6 +24750,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -24759,6 +24780,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -24793,6 +24815,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -24825,6 +24848,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -24849,6 +24873,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -24876,6 +24901,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -26327,6 +26353,7 @@ export namespace Prisma {
     kilometraje?: SortOrder
     calificacionPromedio?: SortOrder
     totalComentarios?: SortOrder
+    estaDisponible?: SortOrder
     tipo?: SortOrder
     año?: SortOrder
     placa?: SortOrder
@@ -26370,6 +26397,7 @@ export namespace Prisma {
     kilometraje?: SortOrder
     calificacionPromedio?: SortOrder
     totalComentarios?: SortOrder
+    estaDisponible?: SortOrder
     tipo?: SortOrder
     año?: SortOrder
     placa?: SortOrder
@@ -26397,6 +26425,7 @@ export namespace Prisma {
     kilometraje?: SortOrder
     calificacionPromedio?: SortOrder
     totalComentarios?: SortOrder
+    estaDisponible?: SortOrder
     tipo?: SortOrder
     año?: SortOrder
     placa?: SortOrder
@@ -28940,6 +28969,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -28972,6 +29002,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -29314,6 +29345,7 @@ export namespace Prisma {
     kilometraje?: IntFilter<"Auto"> | number
     calificacionPromedio?: FloatNullableFilter<"Auto"> | number | null
     totalComentarios?: IntFilter<"Auto"> | number
+    estaDisponible?: BoolFilter<"Auto"> | boolean
     tipo?: StringFilter<"Auto"> | string
     año?: IntFilter<"Auto"> | number
     placa?: StringFilter<"Auto"> | string
@@ -30487,6 +30519,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -30519,6 +30552,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -31060,6 +31094,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -31093,6 +31128,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -31137,6 +31173,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -31170,6 +31207,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -31198,6 +31236,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -31231,6 +31270,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -31275,6 +31315,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -31308,6 +31349,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -31336,6 +31378,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -31369,6 +31412,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -31592,6 +31636,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -31625,6 +31670,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -32037,6 +32083,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -32070,6 +32117,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -32114,6 +32162,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -32147,6 +32196,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -32175,6 +32225,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -32208,6 +32259,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -32376,6 +32428,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -32409,6 +32462,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -33035,6 +33089,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -33196,6 +33251,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -33228,6 +33284,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -33259,6 +33316,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -33461,6 +33519,7 @@ export namespace Prisma {
     kilometraje?: number
     calificacionPromedio?: number | null
     totalComentarios?: number
+    estaDisponible?: boolean
     tipo: string
     año: number
     placa: string
@@ -33485,6 +33544,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -33517,6 +33577,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string
@@ -33548,6 +33609,7 @@ export namespace Prisma {
     kilometraje?: IntFieldUpdateOperationsInput | number
     calificacionPromedio?: NullableFloatFieldUpdateOperationsInput | number | null
     totalComentarios?: IntFieldUpdateOperationsInput | number
+    estaDisponible?: BoolFieldUpdateOperationsInput | boolean
     tipo?: StringFieldUpdateOperationsInput | string
     año?: IntFieldUpdateOperationsInput | number
     placa?: StringFieldUpdateOperationsInput | string

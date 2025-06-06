@@ -342,6 +342,7 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
         transmision: true,
         imagenes: true,
         vecesAlquilado: true,
+        estaDisponible: true
       },
     });
 
@@ -360,6 +361,7 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
         color: car.color,
         imageUrl: car.imagenes.map((img) => img.direccionImagen),
         rentalCount: car.vecesAlquilado,
+        isAvailable: car.estaDisponible
       })),
       totalCars,
       currentPage: page,
@@ -399,6 +401,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
         placa: true,
         combustible: true,
         descripcion: true,
+        estaDisponible: true
       },
     });
 
@@ -424,6 +427,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
       licensePlate: auto.placa,
       fuelType: auto.combustible,
       description: auto.descripcion || '',
+      isAvailable: auto.estaDisponible
     });
   } catch (err) {
     next(err);
@@ -535,6 +539,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
       combustible: fuelType || auto.combustible,
       kilometraje: kilometers !== undefined ? kilometers : auto.kilometraje,
       descripcion: description || auto.descripcion,
+      estaDisponible: typeof isAvailable === 'boolean' ? isAvailable : auto.estaDisponible
     };
 
     // Solo actualiza imágenes si imageUrls es un array no vacío
@@ -571,6 +576,7 @@ router.put('/:id', authenticateToken, isHost, async (req: AuthRequest, res: expr
         color: updatedAuto.color,
         imageUrl: updatedAuto.imagenes.map(img => img.direccionImagen),
         description: updatedAuto.descripcion,
+        isAvailable: updatedAuto.estaDisponible
       },
     });
   } catch (err) {
