@@ -1,4 +1,5 @@
-import { PrismaClient, Transmision, Combustible, RegistradoCon } from '../src/generated/client';
+// import { PrismaClient, Transmision, Combustible, RegistradoCon } from '../src/generated/client';
+import { PrismaClient, Transmision, Combustible, RegistradoCon } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();

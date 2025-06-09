@@ -1,5 +1,6 @@
 import * as express from 'express';
-import { PrismaClient, Prisma, Transmision, Combustible } from '../generated/client';
+// import { PrismaClient, Prisma, Transmision, Combustible } from '../generated/client';
+import { PrismaClient, Prisma, Transmision, Combustible } from '@prisma/client';
 import fileUpload from 'express-fileupload';
 import { UploadedFile } from 'express-fileupload';
 import * as path from 'path';

@@ -1,6 +1,6 @@
 import express, { Response, NextFunction } from 'express';
-/*import { PrismaClient } from '@prisma/client';*/
-import { PrismaClient, Prisma } from '../generated/client';
+import { PrismaClient } from '@prisma/client';
+// import { PrismaClient, Prisma } from '../generated/client';
 import { compare, hash } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
