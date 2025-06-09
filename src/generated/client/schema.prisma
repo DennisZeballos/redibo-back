@@ -171,6 +171,7 @@ model Auto {
   totalComentarios     Int              @default(0)
   reservas             Reserva[]
   disponibilidad       Disponibilidad[]
+  estaDisponible       Boolean          @default(true)
 
   tipo                   String
   año                   Int
