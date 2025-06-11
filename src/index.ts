@@ -1,11 +1,17 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import fileUpload from 'express-fileupload'; 
+import fileUpload from 'express-fileupload';
 import carRoutes from './routes/cars';
 import authRoutes from './routes/auth';
 import path from 'path';
 import cors from 'cors';
 import hostRoutes from './routes/hosts';
+
+
+import { PrismaClient, Prisma, Transmision, Combustible } from '@prisma/client';
+
+const db = new PrismaClient();
+
 
 
 
@@ -32,7 +38,7 @@ app.use(cors({
 }));
 
 // Rutas de API
-app.use('/api/hosts', hostRoutes); 
+app.use('/api/hosts', hostRoutes);
 
 // Middleware
 app.use(express.json());
@@ -64,5 +70,23 @@ app.listen(PORT, () => {
 });
 
 app.get('/', (req, res) => {
-  res.json({message: 'server running'});
+  res.json({ message: 'server running' });
+})
+
+app.get('/autos', async (req, res) => {
+  try {
+    const result = await db.auto.findMany()
+    res.json(result)
+  } catch (error: unknown) {
+    console.log(error);
+
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Error desconocido' });
+    }
+  }
+
+
+
 })

@@ -1,11 +1,9 @@
-// import { PrismaClient, Transmision, Combustible, RegistradoCon } from '../src/generated/client';
 import { PrismaClient, Transmision, Combustible, RegistradoCon } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Hash password común para todos
   const hashedPassword = await hash('password123', 10);
 
   // Crear ubicaciones para autos
@@ -31,6 +29,19 @@ async function main() {
       descripcion: 'Ubicacion secundaria de autos',
       latitud: -11.995,
       longitud: -77.062,
+      esActiva: true,
+    },
+  });
+
+  const ubicacion3 = await prisma.ubicacion.upsert({
+    where: { nombre: 'Ubicacion Sur' },
+    update: {},
+    create: {
+      nombre: 'Ubicacion Sur',
+      departamento: 'La Paz',
+      descripcion: 'Ubicacion adicional en La Paz',
+      latitud: -16.5000,
+      longitud: -68.1500,
       esActiva: true,
     },
   });
@@ -69,7 +80,7 @@ async function main() {
     where: { email: 'guest1@gmail.com' },
     update: {},
     create: {
-      nombreCompleto: 'Guest Uno',
+      nombreCompleto: 'Lorena Barrientos',
       email: 'guest1@gmail.com',
       contraseña: hashedPassword,
       registradoCon: RegistradoCon.email,
@@ -83,7 +94,7 @@ async function main() {
     where: { email: 'guest2@gmail.com' },
     update: {},
     create: {
-      nombreCompleto: 'Guest Dos',
+      nombreCompleto: 'Carla Copa Hernandez',
       email: 'guest2@gmail.com',
       contraseña: hashedPassword,
       registradoCon: RegistradoCon.email,
@@ -93,7 +104,7 @@ async function main() {
     },
   });
 
-  // Crear autos para host1
+  // Autos para host1
   await prisma.auto.createMany({
     data: [
       {
@@ -136,10 +147,30 @@ async function main() {
         transmision: Transmision.MANUAL,
         combustible: Combustible.GASOLINA,
       },
+      {
+        idPropietario: host1.idUsuario,
+        idUbicacion: ubicacion3.idUbicacion,
+        marca: 'Chevrolet',
+        modelo: 'Spark',
+        descripcion: 'Compacto ideal para la ciudad',
+        precioRentaDiario: 40.0,
+        montoGarantia: 150.0,
+        kilometraje: 10000,
+        tipo: 'Hatchback',
+        año: 2017,
+        placa: 'LPZ-321',
+        soat: 'SOAT-321',
+        color: 'Gris',
+        estado: 'ACTIVO',
+        asientos: 4,
+        capacidadMaletero: 300,
+        transmision: Transmision.MANUAL,
+        combustible: Combustible.GASOLINA,
+      },
     ],
   });
 
-  // Crear autos para host2
+  // Autos para host2
   await prisma.auto.createMany({
     data: [
       {
@@ -181,6 +212,26 @@ async function main() {
         capacidadMaletero: 800,
         transmision: Transmision.MANUAL,
         combustible: Combustible.DIESEL,
+      },
+      {
+        idPropietario: host2.idUsuario,
+        idUbicacion: ubicacion3.idUbicacion,
+        marca: 'Nissan',
+        modelo: 'X-Trail',
+        descripcion: 'SUV versátil para todo terreno',
+        precioRentaDiario: 85.0,
+        montoGarantia: 350.0,
+        kilometraje: 18000,
+        tipo: 'SUV',
+        año: 2021,
+        placa: 'LPZ-654',
+        soat: 'SOAT-654',
+        color: 'Verde',
+        estado: 'ACTIVO',
+        asientos: 5,
+        capacidadMaletero: 500,
+        transmision: Transmision.AUTOMATICO,
+        combustible: Combustible.GASOLINA,
       },
     ],
   });
