@@ -378,16 +378,15 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
 
 
 
-
-
-// GET /api/autos/:id - Obtener detalles de un auto
-router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
+router.get('/:id', authenticateToken, async (req: AuthRequest, res, next) => {
   try {
     const autoId = parseInt(req.params.id);
+
     const auto = await db.auto.findUnique({
       where: { idAuto: autoId },
       select: {
         idAuto: true,
+        idPropietario: true,
         marca: true,
         modelo: true,
         año: true,
@@ -396,7 +395,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
         precioRentaDiario: true,
         asientos: true,
         transmision: true,
-        imagenes: true,
+        imagenes: { select: { direccionImagen: true } },
         vecesAlquilado: true,
         ubicacion: true,
         kilometraje: true,
@@ -409,6 +408,12 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
 
     if (!auto) {
       res.status(404).json({ error: 'Auto no encontrado' });
+      return;
+    }
+
+    // ✅ Solo el propietario o un renter puede acceder
+    if (req.user!.role === 'host' && auto.idPropietario !== req.user!.id) {
+      res.status(403).json({ error: 'No autorizado para ver este auto' });
       return;
     }
 
@@ -438,50 +443,59 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
 
 
 
-
-
-
-
-
-
 // DELETE /api/autos/:id - Eliminar un auto
-router.delete('/:id', authenticateToken, isHost, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
-  try {
-    const autoId = parseInt(req.params.id);
-    const auto = await db.auto.findUnique({ where: { idAuto: autoId } });
+router.delete(
+  '/:id',
+  authenticateToken,
+  isHost,
+  async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
+    try {
+      const autoId = parseInt(req.params.id);
+      const auto = await db.auto.findUnique({ where: { idAuto: autoId } });
 
-    if (!auto) {
-      res.status(404).json({ error: 'Auto no encontrado' });
-      return;
-    }
-
-    if (auto.idPropietario !== req.user!.id) {
-      res.status(403).json({ error: 'No autorizado para eliminar este auto' });
-      return;
-    }
-
-    // Verificar si el auto tiene reservas activas
-    const activeRentals = await db.reserva.findMany({
-      where: {
-        idAuto: autoId,
-        fechaInicio: { lte: new Date() },  // ajusta fechaInicio y fechaFin según tu modelo Reserva
-        fechaFin: { gte: new Date() }
+      if (!auto) {
+        res.status(404).json({ error: 'Auto no encontrado' });
+        return;
       }
-    });
 
-    if (activeRentals.length > 0) {
-      res.status(400).json({
-        error: 'No se puede eliminar un auto con reservas activas.'
+      if (auto.idPropietario !== req.user!.id) {
+        res.status(403).json({ error: 'No autorizado para eliminar este auto' });
+        return;
+      }
+
+      // Verificar si el auto tiene reservas activas
+      const activeRentals = await db.reserva.findMany({
+        where: {
+          idAuto: autoId,
+          fechaInicio: { lte: new Date() },
+          fechaFin: { gte: new Date() },
+        },
       });
-      return;
-    }
 
-    await db.auto.delete({ where: { idAuto: autoId } });
-    res.status(200).json({ success: true });
-  } catch (err) {
-    next(err);
+      if (activeRentals.length > 0) {
+        res.status(400).json({
+          error: 'No se puede eliminar un auto con reservas activas.',
+        });
+        return;
+      }
+
+      // ✅ Eliminar imágenes antes de eliminar el auto
+      await db.imagen.deleteMany({
+        where: { idAuto: autoId },
+      });
+
+      // ✅ Ahora eliminar el auto
+      await db.auto.delete({
+        where: { idAuto: autoId },
+      });
+
+      res.status(200).json({ success: true });
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
+
 
 
 
