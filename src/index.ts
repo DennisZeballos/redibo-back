@@ -21,7 +21,8 @@ const app = express();
 
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://pivotes-front-h4pvc7qy8-bryan-s-projects-9e27ee98.vercel.app'
+  'https://pivotes-front-h4pvc7qy8-bryan-s-projects-9e27ee98.vercel.app',
+  'https://redibo-front-phi.vercel.app'
 ];
 
 app.use(cors({
