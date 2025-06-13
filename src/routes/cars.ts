@@ -377,15 +377,16 @@ router.get('/my-cars', authenticateToken, async (req: AuthRequest, res: express.
 
 
 
-
-// GET /api/autos/:id - Obtener detalles de un auto
+// GET /api/autos/:id - Obtener detalles de un auto (solo propietario)
 router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
   try {
     const autoId = parseInt(req.params.id);
+
     const auto = await db.auto.findUnique({
       where: { idAuto: autoId },
       select: {
         idAuto: true,
+        idPropietario: true, // 👈 importante para verificar propiedad
         marca: true,
         modelo: true,
         año: true,
@@ -394,7 +395,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
         precioRentaDiario: true,
         asientos: true,
         transmision: true,
-        imagenes: true,
+        imagenes: { select: { direccionImagen: true } },
         vecesAlquilado: true,
         ubicacion: true,
         kilometraje: true,
@@ -407,6 +408,12 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
 
     if (!auto) {
       res.status(404).json({ error: 'Auto no encontrado' });
+      return;
+    }
+
+    // ✅ Verificar si el usuario actual es el propietario del auto
+    if (auto.idPropietario !== req.user!.id) {
+      res.status(403).json({ error: 'No autorizado para ver este auto' });
       return;
     }
 
@@ -433,6 +440,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: express.Resp
     next(err);
   }
 });
+
 
 
 
